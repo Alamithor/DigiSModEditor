@@ -2,20 +2,20 @@ import os
 import re
 from pathlib import Path
 from os import PathLike
-from typing import Union
+from typing import Union, Generator, Tuple, Dict, List
 
 
-def traverse_asset_files(dir_path: Union[PathLike, Path]):
+def traverse_asset_files(dir_path: Union[PathLike, Path]) -> Generator[Tuple[str, Dict[str, List[str]]]]:
+    """
+    Traverses the directory tree from `dir_path` and finds asset files.
+
+    :param dir_path: The path to the root directory.
+    :return: A generator that yields tuples containing the asset name and its corresponding children data.
+    """
     pattern_geo = r'\.(geom)'
     pattern_skel = r'\.(skel)'
     pattern_anim = r'(\_\w{2}\d{2}|)\.(anim)'
-    # name_list = []
-    # file_list = []
-    asset_data = {}
     for root, dirs, files in os.walk(dir_path):
-        # file_list.extend(files)
-        # name_list.extend([o for o in files if o.endswith('.name')])
-
         files_text = ';'.join(files)
         name_list = [o for o in files if o.endswith('.name')]
 
