@@ -1,3 +1,4 @@
+import json
 import os
 import re
 from pathlib import Path
@@ -5,7 +6,7 @@ from os import PathLike
 from typing import Union, Generator, Tuple, Dict, List
 
 
-def traverse_asset_files(dir_path: Union[PathLike, Path]) -> Generator[Tuple[str, Dict[str, List[str]]]]:
+def traverse_asset_files(dir_path: Union[PathLike, Path]) -> Tuple[str, Dict[str, List[str]]]:
     """
     Traverses the directory tree from `dir_path` and finds asset files.
 
@@ -37,3 +38,59 @@ def traverse_asset_files(dir_path: Union[PathLike, Path]) -> Generator[Tuple[str
             children_data['Animation'] = sorted(anim_files)
 
             yield name, children_data
+
+
+def create_project_structure(project_name: str, dir_path: Union[PathLike, Path]) -> Path:
+    if not project_name:
+        raise ValueError('Project name cannot be empty')
+    project_dir = dir_path / project_name
+    if not project_dir.exists():
+        project_dir.mkdir()
+    mod_dir = project_dir / 'modfiles'
+    if not mod_dir.exists():
+        mod_dir.mkdir()
+
+    return project_dir
+
+
+def write_metadata_mod(author: str, version: Tuple[int, int], category: str, project_dir: Union[PathLike, Path]):
+    metadata_dict = {
+        'author': author,
+        'version': version,
+        'category': category
+    }
+    metadata_file = project_dir / 'METADATA.json'
+    with open(metadata_file, 'w') as f:
+        json.dump(metadata_dict, f)
+
+
+def read_metadata_mod(metadata_file: Union[PathLike, Path]) -> Dict:
+    if not metadata_file.exists():
+        raise FileNotFoundError('Metadata file does not exist')
+    with open(metadata_file, 'r') as f:
+        metadata_dict = json.load(f)
+    metadata_dict['version'] = tuple(metadata_dict['version'])
+    return metadata_dict
+
+
+def write_description_mod(desc: str, project_dir: Union[PathLike, Path]):
+    description_file = project_dir / 'DESCRIPTION.html'
+    with open(description_file, 'w') as f:
+        f.write(desc)
+
+
+def create_project_mod(
+        project_name: str,
+        dir_path: Union[PathLike, Path],
+        author: str,
+        version: Tuple[int, int],
+        category: str,
+        description: str
+) -> None:
+    if not dir_path.exists():
+        raise FileNotFoundError('Directory does not exist')
+
+    project_dir = create_project_structure(project_name, dir_path)
+    write_metadata_mod(author, version, category, project_dir)
+    write_description_mod(description, project_dir)
+
