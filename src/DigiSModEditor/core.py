@@ -79,6 +79,13 @@ def write_description_mod(desc: str, project_dir: Union[PathLike, Path]):
         f.write(desc)
 
 
+def read_description_mod(desc_file: Union[PathLike, Path]) -> str:
+    if not desc_file.exists():
+        raise FileNotFoundError('Description file does not exist')
+    with open(desc_file, 'r') as f:
+        return f.read()
+
+
 def create_project_mod(
         project_name: str,
         dir_path: Union[PathLike, Path],
@@ -93,4 +100,12 @@ def create_project_mod(
     project_dir = create_project_structure(project_name, dir_path)
     write_metadata_mod(author, version, category, project_dir)
     write_description_mod(description, project_dir)
+
+
+def is_project_mod(dir_path: Union[PathLike, Path]) -> bool:
+    if not dir_path.exists():
+        raise FileNotFoundError('Directory does not exist')
+    # check modfiles subdirectory
+    mod_dir = dir_path / 'modfiles'
+    return mod_dir.exists()
 
