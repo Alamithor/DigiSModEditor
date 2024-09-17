@@ -102,10 +102,25 @@ def create_project_mod(
     write_description_mod(description, project_dir)
 
 
-def is_project_mod(dir_path: Union[PathLike, Path]) -> bool:
+def is_project_mod_directory(dir_path: Union[PathLike, Path]) -> bool:
     if not dir_path.exists():
         raise FileNotFoundError('Directory does not exist')
     # check modfiles subdirectory
     mod_dir = dir_path / 'modfiles'
-    return mod_dir.exists()
+    # check METADATA.json and DESCRIPTION.html files
+    metadata_file = dir_path / 'METADATA.json'
+    desc_file = dir_path / 'DESCRIPTION.html'
+    return mod_dir.exists() and metadata_file.exists() and desc_file.exists()
+
+
+def is_dsdb_directory(dir_path: Union[PathLike, Path]) -> bool:
+    if not dir_path.exists():
+        raise FileNotFoundError('Directory does not exist')
+    # check any .name files
+    found_counter = 0
+    for o in dir_path.glob('*.name'):
+        found_counter += 1
+        if found_counter > 2:
+            return True
+    return False
 
