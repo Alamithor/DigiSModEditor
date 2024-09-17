@@ -3,7 +3,38 @@ import os
 import re
 from pathlib import Path
 from os import PathLike
-from typing import Union, Generator, Tuple, Dict, List
+from typing import Union, Tuple, Dict, List
+from enum import StrEnum
+
+
+class Pattern(StrEnum):
+    # GEO = r'\.(geom)'
+    # SKEL = r'\.(skel)'
+    ANIM = r'(\_\w{2}\d{2}|)\.(anim)'
+
+
+def get_asset_related_files(asset_name, files_text) -> Dict:
+    file_name, ext = os.path.splitext(asset_name)
+    # r_geo = f'({file_name})' + Pattern.GEO
+    # r_skel = f'({file_name})' + Pattern.SKEL
+    r_anim = f'({file_name})' + Pattern.ANIM
+
+    result_data = {
+        file_name: {}
+    }
+    name_file = asset_name
+    geo_file = f'{file_name}.geom'
+    skel_file = f'{file_name}.skel'
+    # geo_files = [f'{o_name}.{o_ext}' for (o_name, o_ext) in re.findall(r_geo, files_text)]
+    # skel_files = [f'{o_name}.{o_ext}' for (o_name, o_ext) in re.findall(r_skel, files_text)]
+    anim_files = [f'{o_name}{o_mid}.{o_ext}' for (o_name, o_mid, o_ext) in re.findall(r_anim, files_text)]
+
+    result_data[file_name]['Name'] = [name_file]
+    result_data[file_name]['Geometry'] = [geo_file]
+    result_data[file_name]['Skeleton'] = [skel_file]
+    result_data[file_name]['Animation'] = sorted(anim_files)
+
+    return result_data
 
 
 def traverse_asset_files(dir_path: Union[PathLike, Path]) -> Tuple[str, Dict[str, List[str]]]:
@@ -13,31 +44,17 @@ def traverse_asset_files(dir_path: Union[PathLike, Path]) -> Tuple[str, Dict[str
     :param dir_path: The path to the root directory.
     :return: A generator that yields tuples containing the asset name and its corresponding children data.
     """
-    pattern_geo = r'\.(geom)'
-    pattern_skel = r'\.(skel)'
-    pattern_anim = r'(\_\w{2}\d{2}|)\.(anim)'
     for root, dirs, files in os.walk(dir_path):
         files_text = ';'.join(files)
         name_list = [o for o in files if o.endswith('.name')]
 
         for name in name_list:
-            file_name, ext = os.path.splitext(name)
-            if file_name.startswith('cam_'):
-                continue
+            # file_name, ext = os.path.splitext(name)
+            # if file_name.startswith('cam_'):
+            #     continue
+            asset_structure = get_asset_related_files(name, files_text)
 
-            r_geo = f'({file_name})' + pattern_geo
-            r_skel = f'({file_name})' + pattern_skel
-            r_anim = f'({file_name})' + pattern_anim
-
-            children_data = {}
-            geo_files = [f'{o_name}.{o_ext}' for (o_name, o_ext) in re.findall(r_geo, files_text)]
-            skel_files = [f'{o_name}.{o_ext}' for (o_name, o_ext) in re.findall(r_skel, files_text)]
-            anim_files = [f'{o_name}{o_mid}.{o_ext}' for (o_name, o_mid, o_ext) in re.findall(r_anim, files_text)]
-            children_data['Geometry'] = geo_files
-            children_data['Skeleton'] = skel_files
-            children_data['Animation'] = sorted(anim_files)
-
-            yield name, children_data
+            yield asset_structure
 
 
 def create_project_structure(project_name: str, dir_path: Union[PathLike, Path]) -> Path:
