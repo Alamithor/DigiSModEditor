@@ -14,6 +14,7 @@ class AsukaModel(QStandardItemModel):
     def __init__(self, dir_path: Union[PathLike, Path]):
         super().__init__()
         self._root_path = Path(dir_path)
+        self._src_path = Path(dir_path)
 
         self._queue = []
 
@@ -28,9 +29,12 @@ class AsukaModel(QStandardItemModel):
     @property
     def root_path(self) -> Path: return self._root_path
 
+    @property
+    def src_path(self) -> Path: return self._src_path
+
     def set_scanner_thread(self):
         if self._scanner_thread is None:
-            self._scanner_thread = threads.ScannerThread(self.root_path)
+            self._scanner_thread = threads.ScannerThread(self.src_path)
 
             self._scanner_thread.file_found.connect(self.add_to_queue)
             # self._scanner_thread.all_scan_finished.connect(self.bar)
@@ -43,9 +47,9 @@ class AsukaModel(QStandardItemModel):
     def process_queue(self):
         if self._queue:
             asset_structure = self._queue.pop(0)
-            self.test_add(asset_structure)
+            self.add_asset_item(asset_structure)
 
-    def test_add(self, asset_structure):
+    def add_asset_item(self, asset_structure):
         for k, v in asset_structure.items():
             item = QStandardItem(k)
 
@@ -60,8 +64,12 @@ class AsukaModel(QStandardItemModel):
 
 class AmaterasuModel(AsukaModel):
     """Model which hold project mods information, files, and folders structure"""
-    def __init__(self, dir_path: Union[PathLike, Path]):
+    def __init__(self, dir_path: Union[PathLike, Path], metadata: dict):
         super().__init__(dir_path)
+        self._root_path = dir_path.parent
+        self._author = metadata.get('author')
+        self._version = metadata.get('version')
+        self._category = metadata.get('category')
 
 
 def create_game_data_model(dir_path: Union[PathLike, Path]) -> AsukaModel:
@@ -75,6 +83,6 @@ def create_project_mod_model(dir_path: Union[PathLike, Path]) -> AmaterasuModel:
     if not core.is_project_mod_directory(dir_path):
         raise Exception('Directory is not project mod directory')
     metadata = core.read_metadata_mod(dir_path / 'METADATA.json')
-    model = AmaterasuModel(dir_path / 'modfiles')
+    model = AmaterasuModel(dir_path / 'modfiles', metadata)
     return model
 
