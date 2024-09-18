@@ -2,6 +2,7 @@ from os import PathLike
 from pathlib import Path
 from typing import Union
 
+from PySide6.QtCore import QTimer
 from PySide6.QtGui import QStandardItemModel, QStandardItem
 
 from . import threads
@@ -14,8 +15,15 @@ class AsukaModel(QStandardItemModel):
         super().__init__()
         self._root_path = Path(dir_path)
 
+        self._queue = []
+
         self._scanner_thread = None
         self.set_scanner_thread()
+
+        self._timer = QTimer()
+        self._timer.setInterval(50)
+        self._timer.timeout.connect(self.process_queue)
+        self._timer.start()
 
     @property
     def root_path(self) -> Path: return self._root_path
@@ -24,10 +32,18 @@ class AsukaModel(QStandardItemModel):
         if self._scanner_thread is None:
             self._scanner_thread = threads.ScannerThread(self.root_path)
 
-            self._scanner_thread.file_found.connect(self.test_add)
+            self._scanner_thread.file_found.connect(self.add_to_queue)
             # self._scanner_thread.all_scan_finished.connect(self.bar)
 
             self._scanner_thread.start()
+
+    def add_to_queue(self, asset_structure):
+        self._queue.append(asset_structure)
+
+    def process_queue(self):
+        if self._queue:
+            asset_structure = self._queue.pop(0)
+            self.test_add(asset_structure)
 
     def test_add(self, asset_structure):
         for k, v in asset_structure.items():
@@ -40,16 +56,6 @@ class AsukaModel(QStandardItemModel):
                 item.appendRow(item_grp)
 
             self.appendRow(item)
-
-    def add_item(self, item_name: str, item_data: Union[dict], parent: QStandardItem = None):
-        pass
-
-    def find_item(self, item_path: str) -> QStandardItem:
-        pass
-
-    def update_model(self, item_name: str, item_data: Union[dict], parent: str):
-        # we need to
-        pass
 
 
 class AmaterasuModel(AsukaModel):

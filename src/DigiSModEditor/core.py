@@ -37,26 +37,6 @@ def get_asset_related_files(asset_name, files_text) -> Dict:
     return result_data
 
 
-def traverse_asset_files(dir_path: Union[PathLike, Path]) -> Tuple[str, Dict[str, List[str]]]:
-    """
-    Traverses the directory tree from `dir_path` and finds asset files.
-
-    :param dir_path: The path to the root directory.
-    :return: A generator that yields tuples containing the asset name and its corresponding children data.
-    """
-    for root, dirs, files in os.walk(dir_path):
-        files_text = ';'.join(files)
-        name_list = [o for o in files if o.endswith('.name')]
-
-        for name in name_list:
-            # file_name, ext = os.path.splitext(name)
-            # if file_name.startswith('cam_'):
-            #     continue
-            asset_structure = get_asset_related_files(name, files_text)
-
-            yield asset_structure
-
-
 def create_project_structure(project_name: str, dir_path: Union[PathLike, Path]) -> Path:
     if not project_name:
         raise ValueError('Project name cannot be empty')

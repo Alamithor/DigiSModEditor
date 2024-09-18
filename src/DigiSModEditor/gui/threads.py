@@ -1,4 +1,6 @@
-from PySide6.QtCore import Qt, QThread, Signal
+import os
+
+from PySide6.QtCore import QThread, Signal
 
 from .. import core
 
@@ -15,6 +17,14 @@ class ScannerThread(QThread):
     def dir_path(self): return self._dir_path
 
     def run(self):
-        for asset_structure in core.traverse_asset_files(self.dir_path):
-            self.file_found.emit(asset_structure)
+        for root, dirs, files in os.walk(self.dir_path):
+            if files:
+                files_text = ';'.join(files)
+                name_list = [o for o in files if o.endswith('.name')]
+
+                for name in name_list:
+                    asset_files = core.get_asset_related_files(name, files_text)
+
+                    self.file_found.emit(asset_files)
+
 
