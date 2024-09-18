@@ -1,6 +1,6 @@
 from os import PathLike
 from pathlib import Path
-from typing import Union
+from typing import Union, Tuple
 
 from PySide6.QtCore import QTimer
 from PySide6.QtGui import QStandardItemModel, QStandardItem
@@ -71,17 +71,26 @@ class AmaterasuModel(AsukaModel):
         self._version = metadata.get('version')
         self._category = metadata.get('category')
 
+    @property
+    def author(self) -> str: return self._author
+
+    @property
+    def version(self) -> Tuple[int, int]: return self._version
+
+    @property
+    def category(self) -> str: return self._category
+
 
 def create_game_data_model(dir_path: Union[PathLike, Path]) -> AsukaModel:
     if not core.is_dsdb_directory(dir_path):
-        raise Exception('Directory does not have *.name files')
+        raise FileNotFoundError('Directory does not have *.name files')
     model = AsukaModel(dir_path)
     return model
 
 
 def create_project_mod_model(dir_path: Union[PathLike, Path]) -> AmaterasuModel:
     if not core.is_project_mod_directory(dir_path):
-        raise Exception('Directory is not project mod directory')
+        raise FileNotFoundError('Directory is not project mod directory')
     metadata = core.read_metadata_mod(dir_path / 'METADATA.json')
     model = AmaterasuModel(dir_path / 'modfiles', metadata)
     return model
