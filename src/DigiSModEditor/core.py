@@ -3,21 +3,16 @@ import os
 import re
 from pathlib import Path
 from os import PathLike
-from typing import Union, Tuple, Dict, List
-from enum import StrEnum
+from typing import Union, Tuple, Dict
 
-
-class Pattern(StrEnum):
-    # GEO = r'\.(geom)'
-    # SKEL = r'\.(skel)'
-    ANIM = r'(\_\w{2}\d{2}|)\.(anim)'
+from . import const
 
 
 def get_asset_related_files(asset_name, files_text) -> Dict:
     file_name, ext = os.path.splitext(asset_name)
-    # r_geo = f'({file_name})' + Pattern.GEO
-    # r_skel = f'({file_name})' + Pattern.SKEL
-    r_anim = f'({file_name})' + Pattern.ANIM
+    # r_geo = f'({file_name})' + const.Pattern.GEO
+    # r_skel = f'({file_name})' + const.Pattern.SKEL
+    r_anim = f'({file_name})' + const.Pattern.ANIM
 
     result_data = {
         file_name: {}
