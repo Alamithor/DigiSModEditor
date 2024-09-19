@@ -24,7 +24,9 @@ class ScannerThread(QThread):
 
                 for name in name_list:
                     asset_files = core.get_asset_related_files(name, files_text)
+                    if asset_files:
+                        print(os.path.join(root, name))
 
-                    self.file_found.emit(asset_files)
+                        self.file_found.emit(asset_files)
 
 

@@ -1,3 +1,4 @@
+import os
 from os import PathLike
 from pathlib import Path
 from typing import Union, Tuple
@@ -6,7 +7,7 @@ from PySide6.QtCore import QTimer
 from PySide6.QtGui import QStandardItemModel, QStandardItem
 
 from . import threads
-from .. import core
+from .. import core, const
 
 
 class AsukaModel(QStandardItemModel):
@@ -51,15 +52,24 @@ class AsukaModel(QStandardItemModel):
 
     def add_asset_item(self, asset_structure):
         for k, v in asset_structure.items():
-            item = QStandardItem(k)
+            # asset root item
+            root_item = QStandardItem(k)
 
             for child_grp, child_list in v.items():
-                item_grp = QStandardItem(child_grp)
+                # asset group item
+                group_item = QStandardItem(child_grp)
                 for child_item in child_list:
-                    item_grp.appendRow(QStandardItem(child_item))
-                item.appendRow(item_grp)
+                    name, ext = os.path.splitext(child_item)
+                    # asset files item
+                    file_item = QStandardItem(child_item)
+                    file_item.setData(name, const.ItemData.NAME)
+                    file_item.setData(ext, const.ItemData.EXT)
+                    file_item.setData(child_item, const.ItemData.FILENAME)
+                    file_item.setData(os.path.join(self.src_path, child_item), const.ItemData.FILEPATH)
+                    group_item.appendRow(file_item)
+                root_item.appendRow(group_item)
 
-            self.appendRow(item)
+            self.appendRow(root_item)
 
 
 class AmaterasuModel(AsukaModel):
