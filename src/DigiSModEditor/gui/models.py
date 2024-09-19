@@ -1,7 +1,7 @@
 import os
 from os import PathLike
 from pathlib import Path
-from typing import Union, Tuple, List
+from typing import Union, Tuple, List, Dict
 
 from PySide6.QtCore import QTimer
 from PySide6.QtGui import QStandardItemModel, QStandardItem
@@ -87,9 +87,19 @@ class AsukaModel(QStandardItemModel):
                         child_item = item.child(row_child)
                         yield child_item
 
-    def get_files_path_by_asset_item(self, asset_item: QStandardItem) -> List[Path]:
+    def get_file_paths_by_asset_item(self, asset_item: QStandardItem) -> List[Path]:
         for each_item in self.get_file_items_by_asset_item(asset_item):
             yield Path(each_item.data(const.ItemData.FILEPATH))
+
+    @staticmethod
+    def get_asset_structure_by_asset_item(asset_item: QStandardItem) -> Dict:
+        result = {}
+        if asset_item.hasChildren():
+            result[asset_item.text()] = {}
+            for row_group in range(asset_item.rowCount()):
+                item_grp = asset_item.child(row_group)
+                result[item_grp.text()] = [item_grp.child(row).text() for row in range(item_grp.rowCount())]
+        return result
 
 
 class AmaterasuModel(AsukaModel):
