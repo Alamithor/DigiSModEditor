@@ -1,7 +1,7 @@
 import os
 from os import PathLike
 from pathlib import Path
-from typing import Union, Tuple
+from typing import Union, Tuple, List
 
 from PySide6.QtCore import QTimer
 from PySide6.QtGui import QStandardItemModel, QStandardItem
@@ -70,6 +70,22 @@ class AsukaModel(QStandardItemModel):
                 root_item.appendRow(group_item)
 
             self.appendRow(root_item)
+
+    def find_item_by_name(self, asset_name: str) -> Union[QStandardItem, None]:
+        for row in range(self.rowCount()):
+            item = self.item(row)
+            if item.text() == asset_name:
+                return item
+        return None
+
+    def get_file_items_by_asset_item(self, asset_item: QStandardItem) -> List[QStandardItem]:
+        for row in range(self.rowCount()):
+            item = asset_item.child(row)
+            if item:
+                if item.hasChildren():
+                    for row_child in range(item.rowCount()):
+                        child_item = item.child(row_child)
+                        yield child_item
 
 
 class AmaterasuModel(AsukaModel):
