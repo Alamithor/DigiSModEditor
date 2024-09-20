@@ -120,44 +120,65 @@ def is_dsdb_directory(dir_path: Union[PathLike, Path]) -> bool:
     return False
 
 
-CopyResult = collections.namedtuple('CopyResult', ('success', 'filename', 'message'))
+CopyResult = collections.namedtuple(
+    'CopyResult',
+    (
+        'success',
+        'source',
+        'destination',
+        'message'
+    )
+)
+
+
+def copy_asset_file(
+        src_dir: Union[PathLike, Path],
+        dest_dir: Union[PathLike, Path],
+        file: str,
+        replace: bool = True
+) -> CopyResult:
+    src_path = src_dir / file
+    dest_path = dest_dir / file
+    dest_old = dest_path.with_name(f'{dest_path.name}.old')
+
+    if not src_path.exists():
+        return CopyResult(False, src_path, dest_path, f'Source file {src_path} does not exist')
+
+    if dest_path.exists():
+        if replace:
+            os.rename(dest_path, dest_old)
+        else:
+            return CopyResult(
+                False,
+                src_path,
+                dest_path,
+                f'Destination file {dest_path} already exists. Use the replace option to overwrite.'
+            )
+
+    if not dest_dir.exists():
+        dest_dir.mkdir(parents = True)
+    result = speedcopy.copyfile(str(src_path), str(dest_path))
+    if result:
+        if dest_old.exists():
+            os.remove(dest_old)
+
+        return CopyResult(True, src_path, dest_path, f'Successfully copied {src_path} to {dest_path}.')
+    else:
+        if dest_old.exists():
+            os.rename(dest_old, dest_path)
+
+        return CopyResult(False, src_path, dest_path, f'Failed to copy {src_path} to {dest_path}.')
 
 
 def copy_asset(
-        src_dir: Union[PathLike, Path],
+        src_files: List[Union[PathLike, Path]],
         dest_dir: Union[PathLike, Path],
-        files: List[str],
         replace: bool = True
 ) -> Generator[CopyResult]:
-    for file in files:
-        src_path = src_dir / file
-        dest_path = dest_dir / file
-        dest_old = dest_path.with_name(f'{dest_path.name}.old')
-
-        if not src_path.exists():
-            yield CopyResult(False, file, f'Source file {src_path} does not exist')
-
-        if dest_path.exists():
-            if replace:
-                os.rename(dest_path, dest_old)
-            else:
-                yield CopyResult(
-                    False,
-                    file,
-                    f'Destination file {dest_path} already exists. Use the replace option to overwrite.'
-                )
-
-        result = speedcopy.copyfile(str(src_path), str(dest_path))
-        if result:
-            if dest_old.exists():
-                os.remove(dest_old)
-
-            yield CopyResult(True, file, f'Successfully copied {src_path} to {dest_path}.')
-        else:
-            if dest_old.exists():
-                os.rename(dest_old, dest_path)
-
-            yield CopyResult(False, file, f'Failed to copy {src_path} to {dest_path}.')
+    for src_file in src_files:
+        src_dir = src_file.parent
+        file_name = src_file.name
+        yield copy_asset_file(src_dir, dest_dir, file_name, replace = replace)
 
 
 
