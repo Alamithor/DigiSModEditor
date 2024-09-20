@@ -87,7 +87,7 @@ class AsukaModel(QStandardItemModel):
                         child_item = item.child(row_child)
                         yield child_item
 
-    def get_file_paths_by_asset_item(self, asset_item: QStandardItem) -> List[Path]:
+    def get_files_path_by_asset_item(self, asset_item: QStandardItem) -> List[Path]:
         for each_item in self.get_file_items_by_asset_item(asset_item):
             yield Path(each_item.data(const.ItemData.FILEPATH))
 

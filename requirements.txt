@@ -1,0 +1,2 @@
+PySide6==6.5.3
+speedcopy==2.1.5

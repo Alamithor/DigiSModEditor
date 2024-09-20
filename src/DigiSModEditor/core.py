@@ -1,9 +1,12 @@
+import collections
 import json
 import os
 import re
 from pathlib import Path
 from os import PathLike
-from typing import Union, Tuple, Dict
+from typing import Union, Tuple, Dict, List, Generator
+
+import speedcopy
 
 from . import const
 
@@ -115,4 +118,46 @@ def is_dsdb_directory(dir_path: Union[PathLike, Path]) -> bool:
         if found_counter > 2:
             return True
     return False
+
+
+CopyResult = collections.namedtuple('CopyResult', ('success', 'filename', 'message'))
+
+
+def copy_asset(
+        src_dir: Union[PathLike, Path],
+        dest_dir: Union[PathLike, Path],
+        files: List[str],
+        replace: bool = True
+) -> Generator[CopyResult]:
+    for file in files:
+        src_path = src_dir / file
+        dest_path = dest_dir / file
+        dest_old = dest_path.with_name(f'{dest_path.name}.old')
+
+        if not src_path.exists():
+            yield CopyResult(False, file, f'Source file {src_path} does not exist')
+
+        if dest_path.exists():
+            if replace:
+                os.rename(dest_path, dest_old)
+            else:
+                yield CopyResult(
+                    False,
+                    file,
+                    f'Destination file {dest_path} already exists. Use the replace option to overwrite.'
+                )
+
+        result = speedcopy.copyfile(str(src_path), str(dest_path))
+        if result:
+            if dest_old.exists():
+                os.remove(dest_old)
+
+            yield CopyResult(True, file, f'Successfully copied {src_path} to {dest_path}.')
+        else:
+            if dest_old.exists():
+                os.rename(dest_old, dest_path)
+
+            yield CopyResult(False, file, f'Failed to copy {src_path} to {dest_path}.')
+
+
 
