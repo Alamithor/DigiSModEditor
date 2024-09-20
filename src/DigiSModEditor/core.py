@@ -2,6 +2,7 @@ import collections
 import json
 import os
 import re
+import zipfile
 from pathlib import Path
 from os import PathLike
 from typing import Union, Tuple, Dict, List, Generator
@@ -177,5 +178,16 @@ def copy_asset(
         file_name = src_file.name
         yield copy_asset_file(src_dir, dest_dir, file_name, replace = replace)
 
+
+def pack_project_mods(project_mods_dir: Union[PathLike, Path], dest_dir: Union[PathLike, Path], zip_file_name: str):
+    if not is_project_mods_directory(project_mods_dir):
+        raise FileNotFoundError('Directory is not project mods directory')
+    zip_file_path = dest_dir / zip_file_name
+
+    with zipfile.ZipFile(zip_file_path, 'w') as zip_file:
+        for o in project_mods_dir.rglob('*'):
+            if not o.is_dir():
+                relative_path = o.relative_to(project_mods_dir)
+                zip_file.write(o, relative_path)
 
 
