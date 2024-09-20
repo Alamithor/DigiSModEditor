@@ -35,20 +35,17 @@ def get_asset_related_files(asset_name, files_text) -> Dict:
     return result_data
 
 
-def create_project_structure(project_name: str, dir_path: Union[PathLike, Path]) -> Path:
+def create_project_mods_structure(project_name: str, dir_path: Union[PathLike, Path]) -> Path:
     if not project_name:
         raise ValueError('Project name cannot be empty')
     project_dir = dir_path / project_name
-    if not project_dir.exists():
-        project_dir.mkdir()
-    mod_dir = project_dir / 'modfiles'
-    if not mod_dir.exists():
-        mod_dir.mkdir()
+    mods_dir = project_dir / 'modfiles'
+    mods_dir.mkdir(parents = True, exist_ok = True)
 
     return project_dir
 
 
-def write_metadata_mod(author: str, version: Tuple[int, int], category: str, project_dir: Union[PathLike, Path]):
+def write_metadata_mods(author: str, version: Tuple[int, int], category: str, project_dir: Union[PathLike, Path]):
     metadata_dict = {
         'author': author,
         'version': version,
@@ -59,7 +56,7 @@ def write_metadata_mod(author: str, version: Tuple[int, int], category: str, pro
         json.dump(metadata_dict, f)
 
 
-def read_metadata_mod(metadata_file: Union[PathLike, Path]) -> Dict:
+def read_metadata_mods(metadata_file: Union[PathLike, Path]) -> Dict:
     if not metadata_file.exists():
         raise FileNotFoundError('Metadata file does not exist')
     with open(metadata_file, 'r') as f:
@@ -68,20 +65,20 @@ def read_metadata_mod(metadata_file: Union[PathLike, Path]) -> Dict:
     return metadata_dict
 
 
-def write_description_mod(desc: str, project_dir: Union[PathLike, Path]):
+def write_description_mods(desc: str, project_dir: Union[PathLike, Path]):
     description_file = project_dir / 'DESCRIPTION.html'
     with open(description_file, 'w') as f:
         f.write(desc)
 
 
-def read_description_mod(desc_file: Union[PathLike, Path]) -> str:
+def read_description_mods(desc_file: Union[PathLike, Path]) -> str:
     if not desc_file.exists():
         raise FileNotFoundError('Description file does not exist')
     with open(desc_file, 'r') as f:
         return f.read()
 
 
-def create_project_mod(
+def create_project_mods(
         project_name: str,
         dir_path: Union[PathLike, Path],
         author: str,
@@ -92,12 +89,12 @@ def create_project_mod(
     if not dir_path.exists():
         raise FileNotFoundError('Directory does not exist')
 
-    project_dir = create_project_structure(project_name, dir_path)
-    write_metadata_mod(author, version, category, project_dir)
-    write_description_mod(description, project_dir)
+    project_dir = create_project_mods_structure(project_name, dir_path)
+    write_metadata_mods(author, version, category, project_dir)
+    write_description_mods(description, project_dir)
 
 
-def is_project_mod_directory(dir_path: Union[PathLike, Path]) -> bool:
+def is_project_mods_directory(dir_path: Union[PathLike, Path]) -> bool:
     if not dir_path.exists():
         raise FileNotFoundError('Directory does not exist')
     # check modfiles subdirectory

@@ -132,10 +132,10 @@ def create_game_data_model(dir_path: Union[PathLike, Path]) -> AsukaModel:
     return model
 
 
-def create_project_mod_model(dir_path: Union[PathLike, Path]) -> AmaterasuModel:
-    if not core.is_project_mod_directory(dir_path):
-        raise FileNotFoundError('Directory is not project mod directory')
-    metadata = core.read_metadata_mod(dir_path / 'METADATA.json')
+def create_project_mods_model(dir_path: Union[PathLike, Path]) -> AmaterasuModel:
+    if not core.is_project_mods_directory(dir_path):
+        raise FileNotFoundError('Directory is not project mods directory')
+    metadata = core.read_metadata_mods(dir_path / 'METADATA.json')
     model = AmaterasuModel(dir_path / 'modfiles', metadata)
     return model
 
