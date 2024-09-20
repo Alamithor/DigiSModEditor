@@ -1,7 +1,7 @@
 import os
 from os import PathLike
 from pathlib import Path
-from typing import Union, Tuple, List, Dict
+from typing import Union, Tuple, Dict, Generator
 
 from PySide6.QtCore import QTimer
 from PySide6.QtGui import QStandardItemModel, QStandardItem
@@ -78,7 +78,7 @@ class AsukaModel(QStandardItemModel):
                 return item
         return None
 
-    def get_file_items_by_asset_item(self, asset_item: QStandardItem) -> List[QStandardItem]:
+    def get_files_item_by_asset_item(self, asset_item: QStandardItem) -> Generator[QStandardItem]:
         for row in range(self.rowCount()):
             item = asset_item.child(row)
             if item:
@@ -87,9 +87,13 @@ class AsukaModel(QStandardItemModel):
                         child_item = item.child(row_child)
                         yield child_item
 
-    def get_files_path_by_asset_item(self, asset_item: QStandardItem) -> List[Path]:
-        for each_item in self.get_file_items_by_asset_item(asset_item):
+    def get_files_path_by_asset_item(self, asset_item: QStandardItem) -> Generator[Path]:
+        for each_item in self.get_files_item_by_asset_item(asset_item):
             yield Path(each_item.data(const.ItemData.FILEPATH))
+
+    def get_files_name_by_asset_item(self, asset_item: QStandardItem) -> Generator[str]:
+        for each_item in self.get_files_item_by_asset_item(asset_item):
+            yield each_item.data(const.ItemData.FILENAME)
 
     @staticmethod
     def get_asset_structure_by_asset_item(asset_item: QStandardItem) -> Dict:
