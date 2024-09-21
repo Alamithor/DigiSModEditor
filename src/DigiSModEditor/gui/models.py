@@ -7,7 +7,13 @@ from PySide6.QtCore import QTimer
 from PySide6.QtGui import QStandardItemModel, QStandardItem
 
 from . import threads
-from .. import core, const
+from .. import core, const, error, decorator
+
+__all__ = [
+    'create_game_data_model',
+    'create_dsdb_model',
+    'create_project_mods_model',
+]
 
 
 class AsukaModel(QStandardItemModel):
@@ -125,17 +131,30 @@ class AmaterasuModel(AsukaModel):
     def category(self) -> str: return self._category
 
 
-def create_game_data_model(dir_path: Union[PathLike, Path]) -> AsukaModel:
+@decorator.validate_directory
+def create_dsdb_model(dir_path: Union[PathLike, Path]) -> AsukaModel:
     if not core.is_dsdb_directory(dir_path):
         raise FileNotFoundError('Directory does not have *.name files')
     model = AsukaModel(dir_path)
     return model
 
 
+@decorator.validate_directory
 def create_project_mods_model(dir_path: Union[PathLike, Path]) -> AmaterasuModel:
     if not core.is_project_mods_directory(dir_path):
-        raise FileNotFoundError('Directory is not project mods directory')
+        raise error.InvalidProjectModsDirectory(f'Invalid project mods directory: {dir_path}')
     metadata = core.read_metadata_mods(dir_path / 'METADATA.json')
     model = AmaterasuModel(dir_path / 'modfiles', metadata)
+    return model
+
+
+@decorator.validate_directory
+def create_game_data_model(dir_path: Union[PathLike, Path]) -> Union[AsukaModel, AmaterasuModel]:
+    if core.is_dsdb_directory(dir_path):
+        model = create_dsdb_model(dir_path)
+    elif core.is_project_mods_directory(dir_path):
+        model = create_project_mods_model(dir_path)
+    else:
+        raise error.InvalidGameDataDirectory(f'Invalid game data directory: {dir_path}')
     return model
 
