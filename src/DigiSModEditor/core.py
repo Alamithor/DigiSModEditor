@@ -9,7 +9,7 @@ from typing import Union, Tuple, Dict, List, Generator
 
 import speedcopy
 
-from . import const
+from . import const, error, decorator
 
 
 def get_asset_related_files(asset_name, files_text) -> Dict:
@@ -59,7 +59,7 @@ def write_metadata_mods(author: str, version: Tuple[int, int], category: str, pr
 
 def read_metadata_mods(metadata_file: Union[PathLike, Path]) -> Dict:
     if not metadata_file.exists():
-        raise FileNotFoundError('Metadata file does not exist')
+        raise FileNotFoundError(f'Metadata file does not exist: {metadata_file}')
     with open(metadata_file, 'r') as f:
         metadata_dict = json.load(f)
     metadata_dict['version'] = tuple(metadata_dict['version'])
@@ -74,11 +74,12 @@ def write_description_mods(desc: str, project_dir: Union[PathLike, Path]):
 
 def read_description_mods(desc_file: Union[PathLike, Path]) -> str:
     if not desc_file.exists():
-        raise FileNotFoundError('Description file does not exist')
+        raise FileNotFoundError(f'Description file does not exist: {desc_file}')
     with open(desc_file, 'r') as f:
         return f.read()
 
 
+@decorator.validate_directory
 def create_project_mods(
         project_name: str,
         dir_path: Union[PathLike, Path],
@@ -88,20 +89,17 @@ def create_project_mods(
         description: str
 ) -> None:
     if not dir_path.exists():
-        raise FileNotFoundError('Directory does not exist')
-    if not dir_path.is_dir():
-        raise NotADirectoryError('Not a directory')
+        raise error.InvalidDirectoryPath(f'Directory does not exist: {dir_path}')
 
     project_dir = create_project_mods_structure(project_name, dir_path)
     write_metadata_mods(author, version, category, project_dir)
     write_description_mods(description, project_dir)
 
 
+@decorator.validate_directory
 def is_project_mods_directory(dir_path: Union[PathLike, Path]) -> bool:
     if not dir_path.exists():
-        raise FileNotFoundError('Directory does not exist')
-    if not dir_path.is_dir():
-        raise NotADirectoryError('Not a directory')
+        raise error.InvalidDirectoryPath(f'Directory does not exist: {dir_path}')
     # check modfiles subdirectory
     mod_dir = dir_path / 'modfiles'
     # check METADATA.json and DESCRIPTION.html files
@@ -112,9 +110,7 @@ def is_project_mods_directory(dir_path: Union[PathLike, Path]) -> bool:
 
 def is_dsdb_directory(dir_path: Union[PathLike, Path]) -> bool:
     if not dir_path.exists():
-        raise FileNotFoundError('Directory does not exist')
-    if not dir_path.is_dir():
-        raise NotADirectoryError('Not a directory')
+        raise error.InvalidDirectoryPath(f'Directory does not exist: {dir_path}')
     # check any .name files
     found_counter = 0
     for o in dir_path.glob('*.name'):
@@ -187,7 +183,7 @@ def copy_asset(
 
 def pack_project_mods(project_mods_dir: Union[PathLike, Path], dest_dir: Union[PathLike, Path], zip_file_name: str):
     if not is_project_mods_directory(project_mods_dir):
-        raise FileNotFoundError('Directory is not project mods directory')
+        raise error.InvalidProjectModsDirectory(f'Directory is not project mods directory: {project_mods_dir}')
     zip_file_path = dest_dir / zip_file_name
 
     with zipfile.ZipFile(zip_file_path, 'w') as zip_file:
