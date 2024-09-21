@@ -89,6 +89,8 @@ def create_project_mods(
 ) -> None:
     if not dir_path.exists():
         raise FileNotFoundError('Directory does not exist')
+    if not dir_path.is_dir():
+        raise NotADirectoryError('Not a directory')
 
     project_dir = create_project_mods_structure(project_name, dir_path)
     write_metadata_mods(author, version, category, project_dir)
@@ -98,6 +100,8 @@ def create_project_mods(
 def is_project_mods_directory(dir_path: Union[PathLike, Path]) -> bool:
     if not dir_path.exists():
         raise FileNotFoundError('Directory does not exist')
+    if not dir_path.is_dir():
+        raise NotADirectoryError('Not a directory')
     # check modfiles subdirectory
     mod_dir = dir_path / 'modfiles'
     # check METADATA.json and DESCRIPTION.html files
@@ -109,6 +113,8 @@ def is_project_mods_directory(dir_path: Union[PathLike, Path]) -> bool:
 def is_dsdb_directory(dir_path: Union[PathLike, Path]) -> bool:
     if not dir_path.exists():
         raise FileNotFoundError('Directory does not exist')
+    if not dir_path.is_dir():
+        raise NotADirectoryError('Not a directory')
     # check any .name files
     found_counter = 0
     for o in dir_path.glob('*.name'):
