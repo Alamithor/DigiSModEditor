@@ -87,7 +87,7 @@ class AsukaModel(QStandardItemModel):
                 return item
         return None
 
-    def get_files_item_by_asset_item(self, asset_item: QStandardItem) -> Generator[QStandardItem]:
+    def get_files_item_by_asset_item(self, asset_item: QStandardItem) -> Generator[QStandardItem, None, None]:
         for row in range(self.rowCount()):
             item = asset_item.child(row)
             if item:
@@ -96,11 +96,11 @@ class AsukaModel(QStandardItemModel):
                         child_item = item.child(row_child)
                         yield child_item
 
-    def get_files_path_by_asset_item(self, asset_item: QStandardItem) -> Generator[Path]:
+    def get_files_path_by_asset_item(self, asset_item: QStandardItem) -> Generator[Path, None, None]:
         for each_item in self.get_files_item_by_asset_item(asset_item):
             yield Path(each_item.data(const.ItemData.FILEPATH))
 
-    def get_files_name_by_asset_item(self, asset_item: QStandardItem) -> Generator[str]:
+    def get_files_name_by_asset_item(self, asset_item: QStandardItem) -> Generator[str, None, None]:
         for each_item in self.get_files_item_by_asset_item(asset_item):
             yield each_item.data(const.ItemData.FILENAME)
 

@@ -1,8 +1,12 @@
 import os
+import logging
 
 from PySide6.QtCore import QThread, Signal
 
-from .. import core
+from . import core
+from . import constants as const
+
+logger = logging.getLogger(const.LogName.THREAD)
 
 
 class ScannerThread(QThread):
@@ -25,7 +29,8 @@ class ScannerThread(QThread):
                 for name in name_list:
                     asset_files = core.get_asset_related_files(name, files_text)
                     if asset_files:
-                        # print(os.path.join(root, name))
+                        ast_file_path = os.path.join(root, name)
+                        logger.info(f'Found asset file: {ast_file_path}')
 
                         self.file_found.emit(asset_files)
 

@@ -176,7 +176,7 @@ def copy_asset(
         src_files: List[Union[PathLike, Path]],
         dest_dir: Union[PathLike, Path],
         replace: bool = True
-) -> Generator[CopyResult]:
+) -> Generator[CopyResult, None, None]:
     for src_file in src_files:
         src_dir = src_file.parent
         file_name = src_file.name

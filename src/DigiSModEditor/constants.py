@@ -13,3 +13,7 @@ class ItemData(IntEnum):
     FILENAME = 102
     FILEPATH = 103
 
+
+class LogName(StrEnum):
+    MAIN = 'DigiSModEditor'
+    THREAD = 'DigiSModEditor.threads'
