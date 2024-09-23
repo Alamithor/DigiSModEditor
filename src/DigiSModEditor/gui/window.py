@@ -3,7 +3,8 @@ from pathlib import Path
 from PySide6.QtWidgets import QMainWindow
 
 from . import widgets, models
-from .. import utils
+from .. import utils as utl
+from .. import constants as const
 
 
 class MainWindow(QMainWindow):
@@ -14,7 +15,7 @@ class MainWindow(QMainWindow):
             loader = widgets.UiLoader()
         except Exception as err:
             raise Exception(err)
-        ui_file = utils.get_ui_file('main')
+        ui_file = utl.get_ui_file('main')
         self._ui = loader.load_ui(ui_file, self)
 
         the_path = Path(r'D:\IDrive\Project\2024\DigimonStory\original-content\DSDB')

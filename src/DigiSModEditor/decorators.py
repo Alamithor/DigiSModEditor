@@ -2,7 +2,7 @@ from os import PathLike
 from pathlib import Path
 from functools import wraps
 
-from . import error
+from . import errors as err
 
 
 def validate_directory(func):
@@ -12,6 +12,6 @@ def validate_directory(func):
         if not isinstance(dir_path, (Path, PathLike)):
             raise TypeError(f"{dir_path} must be a Path or PathLike object")
         if not dir_path.is_dir():
-            raise error.InvalidDirectoryPath(f'Invalid directory path: {dir_path}')
+            raise err.InvalidDirectoryPath(f'Invalid directory path: {dir_path}')
         return func(*args, **kwargs)
     return wrapper
