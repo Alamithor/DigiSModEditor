@@ -24,3 +24,6 @@ class UiPath(StrEnum):
     L_PANEL = 'left_panel_ui'
     MODS_DIR_TXT = f'{L_PANEL}.mods_dir_text'
     MODS_DIR_BTN = f'{L_PANEL}.mods_dir_btn'
+    MODS_DROPDOWN = f'{L_PANEL}.current_mods_dropdown'
+    CREATE_MODS_BTN = f'{L_PANEL}.new_mods_btn'
+    MODS_MDL = f'{L_PANEL}.mods_model'

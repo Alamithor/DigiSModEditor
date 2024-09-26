@@ -110,6 +110,7 @@ def is_project_mods_directory(dir_path: Union[PathLike, Path]) -> bool:
     return mod_dir.exists() and metadata_file.exists() and desc_file.exists()
 
 
+@deco.validate_directory
 def is_dsdb_directory(dir_path: Union[PathLike, Path]) -> bool:
     if not dir_path.exists():
         raise err.InvalidDirectoryPath(f'Directory does not exist: {dir_path}')

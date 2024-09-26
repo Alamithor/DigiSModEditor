@@ -43,6 +43,7 @@ class AsukaModel(QStandardItemModel):
     def src_path(self) -> Path: return self._src_path
 
     def set_scanner_thread(self):
+        # TODO: move this outside, put into gui module
         if self._scanner_thread is None:
             self._scanner_thread = th.ScannerThread(self.src_path)
 
