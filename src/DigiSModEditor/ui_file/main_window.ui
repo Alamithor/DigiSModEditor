@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>900</width>
+    <height>700</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -28,40 +28,50 @@
      <number>6</number>
     </property>
     <item>
-     <widget class="QWidget" name="left_panel" native="true"/>
-    </item>
-    <item>
-     <widget class="QTabWidget" name="main_window_tab">
-      <property name="styleSheet">
-       <string notr="true">QTabWidget::tab-bar {
+     <widget class="QSplitter" name="panel_splitter">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <widget class="QWidget" name="left_panel" native="true">
+       <property name="minimumSize">
+        <size>
+         <width>260</width>
+         <height>0</height>
+        </size>
+       </property>
+      </widget>
+      <widget class="QTabWidget" name="main_window_tab">
+       <property name="styleSheet">
+        <string notr="true">QTabWidget::tab-bar {
         alignment: center;
     }</string>
-      </property>
-      <property name="currentIndex">
-       <number>1</number>
-      </property>
-      <property name="usesScrollButtons">
-       <bool>false</bool>
-      </property>
-      <widget class="QWidget" name="setup_tab">
-       <attribute name="title">
-        <string>Setup</string>
-       </attribute>
-      </widget>
-      <widget class="QWidget" name="asset_tab">
-       <attribute name="title">
-        <string>Transfer</string>
-       </attribute>
-      </widget>
-      <widget class="QWidget" name="edit_tab">
-       <attribute name="title">
-        <string>Edit Data</string>
-       </attribute>
-      </widget>
-      <widget class="QWidget" name="pack_tab">
-       <attribute name="title">
-        <string>Pack Mods</string>
-       </attribute>
+       </property>
+       <property name="currentIndex">
+        <number>1</number>
+       </property>
+       <property name="usesScrollButtons">
+        <bool>false</bool>
+       </property>
+       <widget class="QWidget" name="setup_tab">
+        <attribute name="title">
+         <string>Setup</string>
+        </attribute>
+       </widget>
+       <widget class="QWidget" name="asset_tab">
+        <attribute name="title">
+         <string>Transfer</string>
+        </attribute>
+       </widget>
+       <widget class="QWidget" name="edit_tab">
+        <attribute name="title">
+         <string>Edit Data</string>
+        </attribute>
+       </widget>
+       <widget class="QWidget" name="pack_tab">
+        <attribute name="title">
+         <string>Pack Mods</string>
+        </attribute>
+       </widget>
       </widget>
      </widget>
     </item>
@@ -72,7 +82,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>900</width>
      <height>22</height>
     </rect>
    </property>

@@ -1,7 +1,11 @@
 from pathlib import Path
+from typing import Union
 
 from PySide6.QtGui import QStandardItemModel, QStandardItem
-from PySide6.QtWidgets import QMainWindow, QVBoxLayout, QFileDialog
+from PySide6.QtWidgets import (
+    QMainWindow, QVBoxLayout, QFileDialog, QComboBox, QLineEdit, QDoubleSpinBox,
+    QSplitter, QPushButton, QToolButton,
+)
 
 from . import widgets, models
 from .. import utils as utl, core, constants
@@ -20,6 +24,7 @@ class MainWindow(QMainWindow):
         left_panel_ui_file = utl.get_ui_file('project_mods_widget')
         asset_tab_ui_file = utl.get_ui_file('game_asset_widget')
 
+        # assign _ui attributes
         self._ui = loader.load_ui(main_ui_file, self)
         self._ui.left_panel_ui = loader.load_ui(left_panel_ui_file)
         self._ui.asset_tab_ui = loader.load_ui(asset_tab_ui_file)
@@ -43,10 +48,15 @@ class MainWindow(QMainWindow):
         asset_lay.setContentsMargins(0, 0, 0, 0)
         asset_lay.addWidget(self._ui.asset_tab_ui)
 
+        # Rearrange splitter
+        splitter: QSplitter = self.ui(UIP.SPLITTER)
+        splitter.setSizes([1, self._ui.size().width() - 260])
+
         self.ui(UIP.MODS_DIR_TXT).setText(str(utl.get_default_project_dir()))
         self.ui(UIP.MODS_DIR_BTN).clicked.connect(self.browse_directory)
         self.ui(UIP.MODS_DROPDOWN).setModel(self.ui(UIP.MODS_MDL))
         self.populate_mods_list()
+        self.mods_info_update()
 
     def ui(self, ui_name: str = ''):
         if ui_name == '':
@@ -69,9 +79,12 @@ class MainWindow(QMainWindow):
     def populate_mods_list(self):
         root_mods_dir = Path(self.ui(UIP.MODS_DIR_TXT).text())
         the_model: QStandardItemModel = self.ui(UIP.MODS_MDL)
-
         the_model.clear()
-        the_model.appendRow(QStandardItem(''))
+
+        empty_item = QStandardItem('-- New --')
+        empty_item.setData('', constants.ItemData.FILEPATH)
+        the_model.appendRow(empty_item)
+
         for each_dir in root_mods_dir.iterdir():
             if each_dir.is_dir():
                 if core.is_project_mods_directory(each_dir):
@@ -79,4 +92,32 @@ class MainWindow(QMainWindow):
                     item.setData(each_dir, constants.ItemData.FILEPATH)
 
                     the_model.appendRow(item)
+
+    def mods_info_update(self):
+        mods_dd: QComboBox = self.ui(UIP.MODS_DROPDOWN)
+        edit_btn: QToolButton = self.ui(UIP.MODS_EDIT_BTN)
+        create_btn: QPushButton = self.ui(UIP.MODS_CREATE_BTN)
+        meta_ui_list = [
+            UIP.MODS_TITLE_TXT,
+            UIP.MODS_AUTHOR_TXT,
+            UIP.MODS_CAT_TXT,
+            UIP.MODS_VER_SPN,
+            UIP.MODS_DESC_TXT
+        ]
+
+        mods_dir_path = mods_dd.currentData(constants.ItemData.FILEPATH)
+        if mods_dir_path == '':
+            # Create MODE
+            read_only = False
+            create_btn.setVisible(True)
+            edit_btn.setVisible(False)
+        else:
+            # Edit Mode
+            read_only = True
+            create_btn.setVisible(False)
+            edit_btn.setVisible(True)
+
+        for ui_path in meta_ui_list:
+            wgt: Union[QLineEdit, QDoubleSpinBox] = self.ui(ui_path)
+            wgt.setReadOnly(read_only)
 
