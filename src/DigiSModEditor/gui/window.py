@@ -145,3 +145,7 @@ class MainWindow(QMainWindow):
             description = description.toPlainText()
         )
 
+# TODO: rearrange tab order between version and category
+# TODO: dropdown list signal slot to update
+# TODO: more logs in core, and gui
+
