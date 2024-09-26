@@ -4,7 +4,7 @@ from typing import Union
 from PySide6.QtGui import QStandardItemModel, QStandardItem
 from PySide6.QtWidgets import (
     QMainWindow, QVBoxLayout, QFileDialog, QComboBox, QLineEdit, QDoubleSpinBox,
-    QSplitter, QPushButton, QToolButton,
+    QSplitter, QPushButton, QToolButton, QTextEdit,
 )
 
 from . import widgets, models
@@ -57,6 +57,7 @@ class MainWindow(QMainWindow):
         self.ui(UIP.MODS_DROPDOWN).setModel(self.ui(UIP.MODS_MDL))
         self.populate_mods_list()
         self.mods_info_update()
+        self.ui(UIP.MODS_CREATE_BTN).clicked.connect(self.create_project_mods)
 
     def ui(self, ui_name: str = ''):
         if ui_name == '':
@@ -120,4 +121,27 @@ class MainWindow(QMainWindow):
         for ui_path in meta_ui_list:
             wgt: Union[QLineEdit, QDoubleSpinBox] = self.ui(ui_path)
             wgt.setReadOnly(read_only)
+
+    def create_project_mods(self):
+        title: QLineEdit = self.ui(UIP.MODS_TITLE_TXT)
+        author: QLineEdit = self.ui(UIP.MODS_AUTHOR_TXT)
+        category: QLineEdit = self.ui(UIP.MODS_CAT_TXT)
+        description: QTextEdit = self.ui(UIP.MODS_DESC_TXT)
+        version: QDoubleSpinBox = self.ui(UIP.MODS_VER_SPN)
+        dir_path: QLineEdit = self.ui(UIP.MODS_DIR_TXT)
+
+        # Check title, author, and version
+        if title.text() == '' or author.text() == '':
+            raise Exception('Title or Author field shouldn\'t empty!')
+        if version.value() < 0.1:
+            raise Exception('Version should be higher than 0.0')
+
+        core.create_project_mods(
+            dir_path = Path(dir_path.text()),
+            project_name = title.text(),
+            author = author.text(),
+            version = utl.float_to_tuple(version.value()),
+            category = category.text(),
+            description = description.toPlainText()
+        )
 

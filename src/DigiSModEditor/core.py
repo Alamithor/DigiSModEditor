@@ -1,5 +1,6 @@
 import collections
 import json
+import logging
 import os
 import re
 import zipfile
@@ -12,6 +13,8 @@ import speedcopy
 from . import constants as const
 from . import errors as err
 from . import decorators as deco
+
+log = logging.getLogger(const.LogName.MAIN)
 
 
 def get_asset_related_files(asset_name, files_text) -> Dict:
@@ -83,8 +86,8 @@ def read_description_mods(desc_file: Union[PathLike, Path]) -> str:
 
 @deco.validate_directory
 def create_project_mods(
-        project_name: str,
         dir_path: Union[PathLike, Path],
+        project_name: str,
         author: str,
         version: Tuple[int, int],
         category: str,
@@ -94,6 +97,8 @@ def create_project_mods(
         raise err.InvalidDirectoryPath(f'Directory does not exist: {dir_path}')
 
     project_dir = create_project_mods_structure(project_name, dir_path)
+    log.info(f'Project mods folder created: {project_dir}')
+
     write_metadata_mods(author, version, category, project_dir)
     write_description_mods(description, project_dir)
 
