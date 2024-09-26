@@ -68,11 +68,15 @@ class MainWindow(QMainWindow):
 
     def populate_mods_list(self):
         root_mods_dir = Path(self.ui(UIP.MODS_DIR_TXT).text())
+        the_model: QStandardItemModel = self.ui(UIP.MODS_MDL)
+
+        the_model.clear()
+        the_model.appendRow(QStandardItem(''))
         for each_dir in root_mods_dir.iterdir():
             if each_dir.is_dir():
                 if core.is_project_mods_directory(each_dir):
                     item = QStandardItem(each_dir.name)
                     item.setData(each_dir, constants.ItemData.FILEPATH)
 
-                    self.ui(UIP.MODS_MDL).appendRow(item)
+                    the_model.appendRow(item)
 
