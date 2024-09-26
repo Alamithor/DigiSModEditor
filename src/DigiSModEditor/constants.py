@@ -17,3 +17,10 @@ class ItemData(IntEnum):
 class LogName(StrEnum):
     MAIN = 'DigiSModEditor'
     THREAD = 'DigiSModEditor.threads'
+
+
+class UiPath(StrEnum):
+    MAIN = ''
+    L_PANEL = 'left_panel_ui'
+    MODS_DIR_TXT = f'{L_PANEL}.mods_dir_text'
+    MODS_DIR_BTN = f'{L_PANEL}.mods_dir_btn'
