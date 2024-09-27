@@ -42,3 +42,7 @@ class WidgetNotFoundError(BaseDigiSException):
 
 class CreateProjectModsError(BaseDigiSException):
     """Raised if creating project mods fails."""
+
+
+class EditProjectModsInfoError(BaseDigiSException):
+    """Raised if editing project mods information fails."""

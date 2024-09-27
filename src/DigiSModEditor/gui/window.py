@@ -60,7 +60,9 @@ class MainWindow(QMainWindow):
         self.ui(UIP.MODS_DIR_BTN).clicked.connect(self.browse_directory)
         self.ui(UIP.MODS_DROPDOWN).currentIndexChanged.connect(self.mods_dropdown_index_changed)
         self.ui(UIP.MODS_CREATE_BTN).clicked.connect(self.create_project_mods)
-        # self.mods_info_update()
+        self.ui(UIP.MODS_EDIT_BTN).toggled.connect(self.edit_project_mods)
+
+        log.info('Populating project mods list')
         self.populate_mods_list()
 
     def ui(self, ui_name: str = ''):
@@ -196,6 +198,53 @@ class MainWindow(QMainWindow):
                 log.info(f'Added new mods: {title.text()}')
                 mods_dd.setCurrentIndex(index - 1)
 
-# TODO: dropdown list signal slot to update
+    def edit_project_mods(self, checked: bool):
+        edit_btn: QToolButton = self.ui(UIP.MODS_EDIT_BTN)
+        mods_dd: QComboBox = self.ui(UIP.MODS_DROPDOWN)
+        # title_txt: QLineEdit = self.ui(UIP.MODS_TITLE_TXT)
+        author_txt: QLineEdit = self.ui(UIP.MODS_AUTHOR_TXT)
+        category_txt: QLineEdit = self.ui(UIP.MODS_CAT_TXT)
+        version_spn: QDoubleSpinBox = self.ui(UIP.MODS_VER_SPN)
+        description_txt: QTextEdit = self.ui(UIP.MODS_DESC_TXT)
+        meta_ui_data = [
+            # title_txt,
+            author_txt,
+            category_txt,
+            version_spn,
+            description_txt
+        ]
+
+        mods_title = mods_dd.currentText()
+        proj_mods_model = self._get_mods_model(mods_title)
+        if proj_mods_model is None:
+            raise err.EditProjectModsInfoError(f'Cannot find mods information: {mods_title}')
+
+        if checked:
+            log.info('Editing mods metadata and description')
+            edit_btn.setText('Save Changes')
+            read_only = False
+        else:
+            log.info('Saving mods metadata and description')
+            read_only = True
+            try:
+                # proj_mods_model.set_title(title_txt.text())
+                proj_mods_model.set_author(author_txt.text())
+                proj_mods_model.set_category(category_txt.text())
+                proj_mods_model.set_version(utl.float_to_tuple(version_spn.value()))
+                proj_mods_model.set_description(description_txt.toPlainText())
+                proj_mods_model.save_information()
+            except err.EditProjectModsInfoError as e:
+                log.error(e)
+                return -1
+
+            edit_btn.setText('Edit Mods Info')
+
+        for wgt in meta_ui_data:
+            wgt.setReadOnly(read_only)
+
+
 # TODO: more logs in core, and gui
+# TODO: duplicate code need to be addressed
+# TODO: doesn't support mods title change
+# TODO: user pop up dialog error or warning
 

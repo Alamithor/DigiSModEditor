@@ -126,6 +126,7 @@ class AmaterasuModel(AsukaModel):
         self._version = metadata.get('version')
         self._category = metadata.get('category')
         self._description = description
+        self._mods_info_changes = False
 
     @property
     def title(self) -> str: return self._title
@@ -141,6 +142,46 @@ class AmaterasuModel(AsukaModel):
 
     @property
     def description(self) -> str: return self._description
+
+    def set_title(self, title: str):
+        if title == '':
+            raise err.EditProjectModsInfoError('Title shouldn\'t empty!')
+        if title != self.title:
+            self._title = title
+            self._mods_info_changes = True
+
+    def set_author(self, author: str):
+        if author == '':
+            raise err.EditProjectModsInfoError('Author shouldn\'t empty!')
+        if author != self.author:
+            self._author = author
+            self._mods_info_changes = True
+
+    def set_version(self, version: Tuple[int, int]):
+        if version[0] < 0 or version[1] < 0:
+            raise err.EditProjectModsInfoError('Version should be higher than 0.0')
+        if version != self.version:
+            self._version = version
+            self._mods_info_changes = True
+
+    def set_category(self, category: str):
+        if category == '':
+            raise err.EditProjectModsInfoError('Category shouldn\'t empty!')
+        if category != self.category:
+            self._category = category
+            self._mods_info_changes = True
+
+    def set_description(self, description: str):
+        if description == '':
+            raise err.EditProjectModsInfoError('Description shouldn\'t empty!')
+        if description != self.description:
+            self._description = description
+            self._mods_info_changes = True
+
+    def save_information(self):
+        if self._mods_info_changes:
+            core.write_metadata_mods(self.author, self.version, self.category, self.root_path)
+            core.write_description_mods(self.description, self.root_path)
 
 
 @deco.validate_directory
