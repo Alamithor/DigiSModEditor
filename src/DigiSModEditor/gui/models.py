@@ -138,7 +138,8 @@ class AmaterasuModel(AsukaModel):
 @deco.validate_directory
 def create_dsdb_model(dir_path: Union[PathLike, Path]) -> AsukaModel:
     if not core.is_dsdb_directory(dir_path):
-        raise FileNotFoundError('Directory does not have *.name files')
+        # raise err.InvalidDSDBDirectory('Directory does not have *.name files')
+        raise err.InvalidDSDBDirectory(f'Invalid DSDB directory: {dir_path}')
     model = AsukaModel(dir_path)
     return model
 

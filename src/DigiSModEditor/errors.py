@@ -34,3 +34,11 @@ class InvalidGameDataDirectory(BaseDigiSException):
     def __init__(self, message: str):
         info = 'The directory is not a valid game data directory (either Project mods or DSDB).'
         self.message = f'{message}. {info}'
+
+
+class WidgetNotFoundError(BaseDigiSException):
+    """Raised if widget is not found."""
+
+
+class CreateProjectModsError(BaseDigiSException):
+    """Raised if creating project mods fails."""

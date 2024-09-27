@@ -8,7 +8,7 @@ from PySide6.QtWidgets import (
 )
 
 from . import widgets, models
-from .. import utils as utl, core, constants
+from .. import utils as utl, core, constants, errors as err
 from ..constants import UiPath as UIP
 
 
@@ -18,8 +18,8 @@ class MainWindow(QMainWindow):
 
         try:
             loader = widgets.UiLoader()
-        except Exception as err:
-            raise Exception(err)
+        except Exception as e:
+            raise Exception(e)
         main_ui_file = utl.get_ui_file('main_window')
         left_panel_ui_file = utl.get_ui_file('project_mods_widget')
         asset_tab_ui_file = utl.get_ui_file('game_asset_widget')
@@ -68,7 +68,7 @@ class MainWindow(QMainWindow):
         for attr in attrs:
             ui_widget = getattr(ui_widget, attr, None)
             if ui_widget is None:
-                raise Exception(f"Cannot find widget {ui_name}")
+                raise err.WidgetNotFoundError(f"Cannot find widget {ui_name}")
 
         return ui_widget
 
@@ -132,9 +132,9 @@ class MainWindow(QMainWindow):
 
         # Check title, author, and version
         if title.text() == '' or author.text() == '':
-            raise Exception('Title or Author field shouldn\'t empty!')
+            raise err.CreateProjectModsError('Title or Author field shouldn\'t empty!')
         if version.value() < 0.1:
-            raise Exception('Version should be higher than 0.0')
+            raise err.CreateProjectModsError('Version should be higher than 0.0')
 
         core.create_project_mods(
             dir_path = Path(dir_path.text()),
@@ -145,7 +145,6 @@ class MainWindow(QMainWindow):
             description = description.toPlainText()
         )
 
-# TODO: rearrange tab order between version and category
 # TODO: dropdown list signal slot to update
 # TODO: more logs in core, and gui
 

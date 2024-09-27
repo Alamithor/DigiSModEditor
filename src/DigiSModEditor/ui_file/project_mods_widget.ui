@@ -331,6 +331,20 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>mods_dir_text</tabstop>
+  <tabstop>mods_dir_btn</tabstop>
+  <tabstop>mods_dropdown</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>scrollArea</tabstop>
+  <tabstop>mods_title_text</tabstop>
+  <tabstop>mods_author_text</tabstop>
+  <tabstop>mods_version_dspin</tabstop>
+  <tabstop>mods_category_text</tabstop>
+  <tabstop>mods_description_text</tabstop>
+  <tabstop>mods_edit_btn</tabstop>
+  <tabstop>mods_create_btn</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
