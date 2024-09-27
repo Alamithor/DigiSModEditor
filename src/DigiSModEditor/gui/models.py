@@ -118,12 +118,17 @@ class AsukaModel(QStandardItemModel):
 
 class AmaterasuModel(AsukaModel):
     """Model which hold project mods information, files, and folders structure"""
-    def __init__(self, dir_path: Union[PathLike, Path], metadata: dict):
+    def __init__(self, dir_path: Union[PathLike, Path], metadata: dict, description: str):
         super().__init__(dir_path)
         self._root_path = dir_path.parent
+        self._title = dir_path.parent.name
         self._author = metadata.get('author')
         self._version = metadata.get('version')
         self._category = metadata.get('category')
+        self._description = description
+
+    @property
+    def title(self) -> str: return self._title
 
     @property
     def author(self) -> str: return self._author
@@ -134,11 +139,13 @@ class AmaterasuModel(AsukaModel):
     @property
     def category(self) -> str: return self._category
 
+    @property
+    def description(self) -> str: return self._description
+
 
 @deco.validate_directory
 def create_dsdb_model(dir_path: Union[PathLike, Path]) -> AsukaModel:
     if not core.is_dsdb_directory(dir_path):
-        # raise err.InvalidDSDBDirectory('Directory does not have *.name files')
         raise err.InvalidDSDBDirectory(f'Invalid DSDB directory: {dir_path}')
     model = AsukaModel(dir_path)
     return model
@@ -149,7 +156,8 @@ def create_project_mods_model(dir_path: Union[PathLike, Path]) -> AmaterasuModel
     if not core.is_project_mods_directory(dir_path):
         raise err.InvalidProjectModsDirectory(f'Invalid project mods directory: {dir_path}')
     metadata = core.read_metadata_mods(dir_path / 'METADATA.json')
-    model = AmaterasuModel(dir_path / 'modfiles', metadata)
+    description = core.read_description_mods(dir_path / 'DESCRIPTION.html')
+    model = AmaterasuModel(dir_path / 'modfiles', metadata, description)
     return model
 
 

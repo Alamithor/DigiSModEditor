@@ -25,3 +25,7 @@ def float_to_tuple(value: float) -> tuple[int, int]:
     integer_part = int(value)
     fractional_part = int((value - integer_part) * 10)
     return integer_part, fractional_part
+
+
+def tuple_to_float(value: tuple[int, int]) -> float:
+    return value[0] + value[1] / 10
