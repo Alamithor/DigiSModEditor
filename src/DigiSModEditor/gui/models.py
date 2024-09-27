@@ -28,13 +28,13 @@ class AsukaModel(QStandardItemModel):
 
         self._queue = []
 
-        self._scanner_thread = None
-        self.set_scanner_thread()
+        # self._scanner_thread = None
+        # self.set_scanner_thread()
 
-        self._timer = QTimer()
-        self._timer.setInterval(50)
-        self._timer.timeout.connect(self.process_queue)
-        self._timer.start()
+        # self._timer = QTimer()
+        # self._timer.setInterval(50)
+        # self._timer.timeout.connect(self.process_queue)
+        # self._timer.start()
 
     @property
     def root_path(self) -> Path: return self._root_path
