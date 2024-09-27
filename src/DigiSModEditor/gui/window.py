@@ -75,6 +75,7 @@ class MainWindow(QMainWindow):
 
     def browse_directory(self):
         directory = QFileDialog.getExistingDirectory(self, "Select Directory")
+        log.info(f"Selected directory: {directory}")
         if directory:
             self._ui.left_panel_ui.mods_dir_text.setText(f"{directory}")
 
@@ -94,11 +95,14 @@ class MainWindow(QMainWindow):
     def populate_mods_list(self):
         root_mods_dir = Path(self.ui(UIP.MODS_DIR_TXT).text())
         mods_dd: QComboBox = self.ui(UIP.MODS_DROPDOWN)
+        log.info(f'Populating mods list: {root_mods_dir}')
         mods_dd.clear()
 
+        log.info(f'Adding default: -- New --')
         mods_dd.addItem('-- New --', userData = None)
         for each_dir in root_mods_dir.iterdir():
             if each_dir.is_dir():
+                log.info(f'Adding: {each_dir.name}')
                 self._add_new_mods(each_dir.name, each_dir)
 
     def mods_info_update(self):
@@ -137,14 +141,21 @@ class MainWindow(QMainWindow):
         version: QDoubleSpinBox = self.ui(UIP.MODS_VER_SPN)
         dir_path: QLineEdit = self.ui(UIP.MODS_DIR_TXT)
 
-        # Check title, author, and version
+        mods_title = title.text()
+        root_dir_path = Path(dir_path.text())
+        mods_dir_path = root_dir_path / mods_title
+
+        log.info('Checking title, author, and version fields')
         if title.text() == '' or author.text() == '':
             raise err.CreateProjectModsError('Title or Author field shouldn\'t empty!')
         if version.value() < 0.1:
             raise err.CreateProjectModsError('Version should be higher than 0.0')
+        if mods_dir_path.exists():
+            raise err.CreateProjectModsError(f'Mods folder already exists: {mods_dir_path}')
 
+        log.info(f'Creating new mods: {title.text()}')
         core.create_project_mods(
-            dir_path = Path(dir_path.text()),
+            dir_path = root_dir_path,
             project_name = title.text(),
             author = author.text(),
             version = utl.float_to_tuple(version.value()),
@@ -152,12 +163,12 @@ class MainWindow(QMainWindow):
             description = description.toPlainText()
         )
 
-        new_project_mods = Path(dir_path.text()) / title.text()
-        if new_project_mods.exists():
+        if mods_dir_path.exists():
             mods_dd: QComboBox = self.ui(UIP.MODS_DROPDOWN)
-            index = self._add_new_mods(title.text(), new_project_mods)
+            index = self._add_new_mods(title.text(), mods_dir_path)
 
             if index > 0:
+                log.info(f'Added new mods: {title.text()}')
                 mods_dd.setCurrentIndex(index - 1)
 
 # TODO: dropdown list signal slot to update
