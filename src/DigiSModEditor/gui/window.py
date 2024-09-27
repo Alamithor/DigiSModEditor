@@ -33,8 +33,6 @@ class MainWindow(QMainWindow):
         self._ui.left_panel_ui = loader.load_ui(left_panel_ui_file)
         self._ui.asset_tab_ui = loader.load_ui(asset_tab_ui_file)
 
-        self._ui.left_panel_ui.mods_model = QStandardItemModel()
-
         # Create Tab
         # create_tab_ui_file = utl.get_ui_file('setup_widget')
         # create_tab_widget = loader.load_ui(create_tab_ui_file)
@@ -58,7 +56,6 @@ class MainWindow(QMainWindow):
 
         self.ui(UIP.MODS_DIR_TXT).setText(str(utl.get_default_project_dir()))
         self.ui(UIP.MODS_DIR_BTN).clicked.connect(self.browse_directory)
-        self.ui(UIP.MODS_DROPDOWN).setModel(self.ui(UIP.MODS_MDL))
         self.populate_mods_list()
         self.mods_info_update()
         self.ui(UIP.MODS_CREATE_BTN).clicked.connect(self.create_project_mods)
@@ -81,22 +78,28 @@ class MainWindow(QMainWindow):
         if directory:
             self._ui.left_panel_ui.mods_dir_text.setText(f"{directory}")
 
-    def _add_new_mods(self, title: str, dir_path: Union[PathLike, Path, str]):
-        new_item = QStandardItem(title)
-        new_item.setData(dir_path, const.ItemData.FILEPATH)
+    def _add_new_mods(self, title: str, dir_path: Union[PathLike, Path]) -> int:
+        mods_dd: QComboBox = self.ui(UIP.MODS_DROPDOWN)
+        index = mods_dd.count() + 1
+        try:
+            new_project_mods = models.create_project_mods_model(dir_path)
+        except err.InvalidProjectModsDirectory as e:
+            log.error(e)
+            return -1
 
-        self.ui(UIP.MODS_MDL).appendRow(new_item)
+        mods_dd.insertItem(index, title, userData = new_project_mods)
+
+        return index
 
     def populate_mods_list(self):
         root_mods_dir = Path(self.ui(UIP.MODS_DIR_TXT).text())
-        the_model: QStandardItemModel = self.ui(UIP.MODS_MDL)
-        the_model.clear()
+        mods_dd: QComboBox = self.ui(UIP.MODS_DROPDOWN)
+        mods_dd.clear()
 
-        self._add_new_mods('-- New --', '')
+        mods_dd.addItem('-- New --', userData = None)
         for each_dir in root_mods_dir.iterdir():
             if each_dir.is_dir():
-                if core.is_project_mods_directory(each_dir):
-                    self._add_new_mods(each_dir.name, each_dir)
+                self._add_new_mods(each_dir.name, each_dir)
 
     def mods_info_update(self):
         mods_dd: QComboBox = self.ui(UIP.MODS_DROPDOWN)
@@ -110,8 +113,8 @@ class MainWindow(QMainWindow):
             UIP.MODS_DESC_TXT
         ]
 
-        mods_dir_path = mods_dd.currentData(const.ItemData.FILEPATH)
-        if mods_dir_path == '':
+        proj_mods_model = mods_dd.currentData()
+        if proj_mods_model is None:
             # Create MODE
             read_only = False
             create_btn.setVisible(True)
@@ -150,8 +153,12 @@ class MainWindow(QMainWindow):
         )
 
         new_project_mods = Path(dir_path.text()) / title.text()
-        if core.is_project_mods_directory(new_project_mods):
-            self._add_new_mods(title.text(), new_project_mods)
+        if new_project_mods.exists():
+            mods_dd: QComboBox = self.ui(UIP.MODS_DROPDOWN)
+            index = self._add_new_mods(title.text(), new_project_mods)
+
+            if index > 0:
+                mods_dd.setCurrentIndex(index - 1)
 
 # TODO: dropdown list signal slot to update
 # TODO: more logs in core, and gui
