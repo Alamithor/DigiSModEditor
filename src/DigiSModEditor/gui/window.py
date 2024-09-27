@@ -1,3 +1,5 @@
+import logging
+from os import PathLike
 from pathlib import Path
 from typing import Union
 
@@ -8,8 +10,10 @@ from PySide6.QtWidgets import (
 )
 
 from . import widgets, models
-from .. import utils as utl, core, constants, errors as err
+from .. import utils as utl, core, constants as const, errors as err
 from ..constants import UiPath as UIP
+
+log = logging.getLogger(const.LogName.MAIN)
 
 
 class MainWindow(QMainWindow):
@@ -77,22 +81,22 @@ class MainWindow(QMainWindow):
         if directory:
             self._ui.left_panel_ui.mods_dir_text.setText(f"{directory}")
 
+    def _add_new_mods(self, title: str, dir_path: Union[PathLike, Path, str]):
+        new_item = QStandardItem(title)
+        new_item.setData(dir_path, const.ItemData.FILEPATH)
+
+        self.ui(UIP.MODS_MDL).appendRow(new_item)
+
     def populate_mods_list(self):
         root_mods_dir = Path(self.ui(UIP.MODS_DIR_TXT).text())
         the_model: QStandardItemModel = self.ui(UIP.MODS_MDL)
         the_model.clear()
 
-        empty_item = QStandardItem('-- New --')
-        empty_item.setData('', constants.ItemData.FILEPATH)
-        the_model.appendRow(empty_item)
-
+        self._add_new_mods('-- New --', '')
         for each_dir in root_mods_dir.iterdir():
             if each_dir.is_dir():
                 if core.is_project_mods_directory(each_dir):
-                    item = QStandardItem(each_dir.name)
-                    item.setData(each_dir, constants.ItemData.FILEPATH)
-
-                    the_model.appendRow(item)
+                    self._add_new_mods(each_dir.name, each_dir)
 
     def mods_info_update(self):
         mods_dd: QComboBox = self.ui(UIP.MODS_DROPDOWN)
@@ -106,7 +110,7 @@ class MainWindow(QMainWindow):
             UIP.MODS_DESC_TXT
         ]
 
-        mods_dir_path = mods_dd.currentData(constants.ItemData.FILEPATH)
+        mods_dir_path = mods_dd.currentData(const.ItemData.FILEPATH)
         if mods_dir_path == '':
             # Create MODE
             read_only = False
@@ -144,6 +148,10 @@ class MainWindow(QMainWindow):
             category = category.text(),
             description = description.toPlainText()
         )
+
+        new_project_mods = Path(dir_path.text()) / title.text()
+        if core.is_project_mods_directory(new_project_mods):
+            self._add_new_mods(title.text(), new_project_mods)
 
 # TODO: dropdown list signal slot to update
 # TODO: more logs in core, and gui
