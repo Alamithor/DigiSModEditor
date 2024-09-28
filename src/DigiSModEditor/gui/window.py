@@ -1,17 +1,16 @@
 import logging
+import time
 from os import PathLike
 from pathlib import Path
 from typing import Union
 
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QStandardItemModel, QStandardItem
 from PySide6.QtWidgets import (
     QMainWindow, QVBoxLayout, QFileDialog, QComboBox, QLineEdit, QDoubleSpinBox,
     QSplitter, QPushButton, QToolButton, QTextEdit, QTreeView,
 )
 
 from . import widgets, models
-from .. import utils as utl, core, constants as const, errors as err
+from .. import utils as utl, core, constants as const, errors as err, threads as th
 from ..constants import UiPath as UIP
 
 log = logging.getLogger(const.LogName.MAIN)
@@ -65,6 +64,11 @@ class MainWindow(QMainWindow):
         log.info('Populating project mods list')
         self.populate_mods_list()
 
+        # start thread
+        for mods_name, data in self._mods_model_data.items():
+            mods_thread = data.get('thread')
+            self.scan_project_contents(mods_thread)
+
     def ui(self, ui_name: str = ''):
         if ui_name == '':
             return self._ui
@@ -84,17 +88,30 @@ class MainWindow(QMainWindow):
         if directory:
             self._ui.left_panel_ui.mods_dir_text.setText(f"{directory}")
 
-    def scan_project_contents(self):
-        pass
+    @staticmethod
+    def scan_project_contents(scanner: th.ScannerThread):
+        current_time = time.time()
+        rescan_delay = 120 # 2 Minute
+        if current_time - scanner.last_scan_time < rescan_delay or scanner.last_scan_time == 0:
+            if scanner.isRunning():
+                scanner.stop()
+            scanner.start()
 
-    def _add_mods_model(self, title: str, model: models.AmaterasuModel):
-        self._mods_model_data[title] = model
+    def _add_mods_model(self, title: str, asset_model: models.AmaterasuModel):
+        new_scanner = th.ScannerThread(asset_model.src_path)
+        new_data = {
+            'asset_model': asset_model,
+            'thread': new_scanner,
+        }
+        new_scanner.asset_file_found.connect(asset_model.add_to_queue)
+
+        self._mods_model_data[title] = new_data
 
     def _remove_mods_model(self, title: str):
         del self._mods_model_data[title]
 
     def _get_mods_model(self, title: str) -> Union[models.AmaterasuModel, None]:
-        return self._mods_model_data.get(title, None)
+        return self._mods_model_data.get(title, {}).get('asset_model', None)
 
     def _add_new_mods(self, title: str, dir_path: Union[PathLike, Path]) -> int:
         mods_dd: QComboBox = self.ui(UIP.MODS_DROPDOWN)
@@ -166,8 +183,7 @@ class MainWindow(QMainWindow):
                 wgt.setValue(val)
 
         log.info(f'Set mods asset model: {proj_mods_model}')
-        if proj_mods_model is not None:
-            asset_tv.setModel(proj_mods_model)
+        asset_tv.setModel(proj_mods_model)
 
     def create_project_mods(self):
         title: QLineEdit = self.ui(UIP.MODS_TITLE_TXT)

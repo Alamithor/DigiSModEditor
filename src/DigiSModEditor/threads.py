@@ -7,7 +7,7 @@ from PySide6.QtCore import QThread, Signal
 from . import core
 from . import constants as const
 
-log = logging.getLogger(const.LogName.THREAD)
+log = logging.getLogger(const.LogName.MAIN)
 
 
 class ScannerThread(QThread):
@@ -33,6 +33,7 @@ class ScannerThread(QThread):
     def run(self):
         self._last_scan_time = time.time()
 
+        log.info(f'Start scanning: {self.dir_path}')
         for root, dirs, files in os.walk(self.dir_path):
             if self._stop:
                 log.info('Stop scanning')

@@ -1,3 +1,4 @@
+import logging
 import os
 from os import PathLike
 from pathlib import Path
@@ -7,7 +8,6 @@ from PySide6.QtCore import QTimer
 from PySide6.QtGui import QStandardItemModel, QStandardItem
 
 from .. import core
-from .. import threads as th
 from .. import constants as const
 from .. import errors as err
 from .. import decorators as deco
@@ -17,6 +17,8 @@ __all__ = [
     'create_dsdb_model',
     'create_project_mods_model',
 ]
+
+log = logging.getLogger(const.LogName.MAIN)
 
 
 class AsukaModel(QStandardItemModel):
@@ -28,13 +30,10 @@ class AsukaModel(QStandardItemModel):
 
         self._queue = []
 
-        # self._scanner_thread = None
-        # self.set_scanner_thread()
-
-        # self._timer = QTimer()
-        # self._timer.setInterval(50)
-        # self._timer.timeout.connect(self.process_queue)
-        # self._timer.start()
+        self._timer = QTimer()
+        self._timer.setInterval(50)
+        self._timer.timeout.connect(self.process_queue)
+        self._timer.start()
 
     @property
     def root_path(self) -> Path: return self._root_path
@@ -42,20 +41,13 @@ class AsukaModel(QStandardItemModel):
     @property
     def src_path(self) -> Path: return self._src_path
 
-    def set_scanner_thread(self):
-        # TODO: move this outside, put into gui module
-        if self._scanner_thread is None:
-            self._scanner_thread = th.ScannerThread(self.src_path)
-
-            self._scanner_thread.asset_file_found.connect(self.add_to_queue)
-
-            self._scanner_thread.start()
-
     def add_to_queue(self, asset_structure):
+        log.info(f'Add to queue: {asset_structure}')
         self._queue.append(asset_structure)
 
     def process_queue(self):
         if self._queue:
+            log.info(f'Process queue: {self._queue}')
             asset_structure = self._queue.pop(0)
             self.add_asset_item(asset_structure)
 
