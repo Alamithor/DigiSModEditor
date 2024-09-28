@@ -47,8 +47,7 @@ class AsukaModel(QStandardItemModel):
         if self._scanner_thread is None:
             self._scanner_thread = th.ScannerThread(self.src_path)
 
-            self._scanner_thread.file_found.connect(self.add_to_queue)
-            # self._scanner_thread.all_scan_finished.connect(self.bar)
+            self._scanner_thread.asset_file_found.connect(self.add_to_queue)
 
             self._scanner_thread.start()
 
@@ -121,7 +120,7 @@ class AmaterasuModel(AsukaModel):
     def __init__(self, dir_path: Union[PathLike, Path], metadata: dict, description: str):
         super().__init__(dir_path)
         self._root_path = dir_path.parent
-        self._title = dir_path.parent.name
+        self._name = metadata.get('name')
         self._author = metadata.get('author')
         self._version = metadata.get('version')
         self._category = metadata.get('category')
@@ -129,7 +128,7 @@ class AmaterasuModel(AsukaModel):
         self._mods_info_changes = False
 
     @property
-    def title(self) -> str: return self._title
+    def title(self) -> str: return self._name
 
     @property
     def author(self) -> str: return self._author
@@ -147,7 +146,7 @@ class AmaterasuModel(AsukaModel):
         if title == '':
             raise err.EditProjectModsInfoError('Title shouldn\'t empty!')
         if title != self.title:
-            self._title = title
+            self._name = title
             self._mods_info_changes = True
 
     def set_author(self, author: str):

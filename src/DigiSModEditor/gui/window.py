@@ -84,6 +84,9 @@ class MainWindow(QMainWindow):
         if directory:
             self._ui.left_panel_ui.mods_dir_text.setText(f"{directory}")
 
+    def scan_project_contents(self):
+        pass
+
     def _add_mods_model(self, title: str, model: models.AmaterasuModel):
         self._mods_model_data[title] = model
 

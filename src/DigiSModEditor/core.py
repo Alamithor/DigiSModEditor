@@ -51,8 +51,9 @@ def create_project_mods_structure(project_name: str, dir_path: Union[PathLike, P
     return project_dir
 
 
-def write_metadata_mods(author: str, version: Tuple[int, int], category: str, project_dir: Union[PathLike, Path]):
+def write_metadata_mods(title: str, author: str, version: Tuple[int, int], category: str, project_dir: Union[PathLike, Path]):
     metadata_dict = {
+        'name': title,
         'author': author,
         'version': version,
         'category': category
@@ -99,7 +100,7 @@ def create_project_mods(
     project_dir = create_project_mods_structure(project_name, dir_path)
     log.info(f'Project mods folder created: {project_dir}')
 
-    write_metadata_mods(author, version, category, project_dir)
+    write_metadata_mods(project_name, author, version, category, project_dir)
     write_description_mods(description, project_dir)
 
 

@@ -11,7 +11,8 @@ logger = logging.getLogger(const.LogName.THREAD)
 
 class ScannerThread(QThread):
     all_scan_finished = Signal()
-    file_found = Signal(dict)
+    asset_file_found = Signal(dict)
+    data_file_found = Signal(dict)
 
     def __init__(self, dir_path):
         super().__init__()
@@ -23,8 +24,10 @@ class ScannerThread(QThread):
     def run(self):
         for root, dirs, files in os.walk(self.dir_path):
             if files:
-                files_text = ';'.join(files)
+                files_text = ''
                 name_list = [o for o in files if o.endswith('.name')]
+                if name_list:
+                    files_text = ';'.join(files)
 
                 for name in name_list:
                     asset_files = core.get_asset_related_files(name, files_text)
@@ -32,6 +35,8 @@ class ScannerThread(QThread):
                         ast_file_path = os.path.join(root, name)
                         logger.info(f'Found asset file: {ast_file_path}')
 
-                        self.file_found.emit(asset_files)
+                        self.asset_file_found.emit(asset_files)
+
+        self.all_scan_finished.emit()
 
 
