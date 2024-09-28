@@ -7,7 +7,7 @@ from PySide6.QtCore import QThread, Signal
 from . import core
 from . import constants as const
 
-log = logging.getLogger(const.LogName.MAIN)
+log = logging.getLogger(const.LogName.THREAD)
 
 
 class ScannerThread(QThread):

@@ -26,25 +26,25 @@ class MainWindow(QMainWindow):
             raise Exception(e)
         main_ui_file = utl.get_ui_file('main_window')
         left_panel_ui_file = utl.get_ui_file('project_mods_widget')
-        asset_tab_ui_file = utl.get_ui_file('game_asset_widget')
+        setup_tab_ui_file = utl.get_ui_file('setup_widget')
+        asset_tab_ui_file = utl.get_ui_file('asset_transfer_widget')
 
         # assign _ui attributes
         self._ui = loader.load_ui(main_ui_file, self)
         self._ui.left_panel_ui = loader.load_ui(left_panel_ui_file)
+        self._ui.setup_tab_ui = loader.load_ui(setup_tab_ui_file)
         self._ui.asset_tab_ui = loader.load_ui(asset_tab_ui_file)
         self._mods_model_data = {}
-
-        # Create Tab
-        # create_tab_ui_file = utl.get_ui_file('setup_widget')
-        # create_tab_widget = loader.load_ui(create_tab_ui_file)
-        # create_lay = QVBoxLayout(self._ui.setup_tab)
-        # create_lay.setContentsMargins(0, 0, 0, 0)
-        # create_lay.addWidget(create_tab_widget)
 
         # Left panel
         left_lay = QVBoxLayout(self._ui.left_panel)
         left_lay.setContentsMargins(0, 0, 0, 0)
         left_lay.addWidget(self._ui.left_panel_ui)
+
+        # Setup Tab
+        create_lay = QVBoxLayout(self._ui.setup_tab)
+        create_lay.setContentsMargins(0, 0, 0, 0)
+        create_lay.addWidget(self._ui.setup_tab_ui)
 
         # Asset Tab
         asset_lay = QVBoxLayout(self._ui.asset_tab)
