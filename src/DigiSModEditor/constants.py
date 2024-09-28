@@ -43,3 +43,5 @@ class UiPath(StrEnum):
     MODS_DESC_TXT = f'{L_PANEL}.mods_description_text'
     MODS_EDIT_BTN = f'{L_PANEL}.mods_edit_btn'
     MODS_CREATE_BTN = f'{L_PANEL}.mods_create_btn'
+    # Mods assets
+    MODS_ASSET_TV = f'{L_PANEL}.mods_asset_tv'

@@ -7,7 +7,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QStandardItemModel, QStandardItem
 from PySide6.QtWidgets import (
     QMainWindow, QVBoxLayout, QFileDialog, QComboBox, QLineEdit, QDoubleSpinBox,
-    QSplitter, QPushButton, QToolButton, QTextEdit,
+    QSplitter, QPushButton, QToolButton, QTextEdit, QTreeView,
 )
 
 from . import widgets, models
@@ -134,6 +134,7 @@ class MainWindow(QMainWindow):
             UIP.MODS_VER_SPN: 0.0,
             UIP.MODS_DESC_TXT: ''
         }
+        asset_tv: QTreeView = self.ui(UIP.MODS_ASSET_TV)
 
         mods_title = mods_dd.itemText(index)
         proj_mods_model = self._get_mods_model(mods_title)
@@ -154,6 +155,7 @@ class MainWindow(QMainWindow):
             meta_ui_data[UIP.MODS_VER_SPN] = utl.tuple_to_float(proj_mods_model.version)
             meta_ui_data[UIP.MODS_DESC_TXT] = proj_mods_model.description
 
+        log.info(f'Setting mods info ui data: {meta_ui_data}')
         for ui_path, val in meta_ui_data.items():
             wgt: Union[QLineEdit, QDoubleSpinBox, QTextEdit] = self.ui(ui_path)
             wgt.setReadOnly(read_only)
@@ -162,6 +164,10 @@ class MainWindow(QMainWindow):
                 wgt.setText(val)
             elif isinstance(wgt, QDoubleSpinBox):
                 wgt.setValue(val)
+
+        log.info(f'Set mods asset model: {proj_mods_model}')
+        if proj_mods_model is not None:
+            asset_tv.setModel(proj_mods_model)
 
     def create_project_mods(self):
         title: QLineEdit = self.ui(UIP.MODS_TITLE_TXT)
