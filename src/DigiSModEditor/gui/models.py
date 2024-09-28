@@ -42,16 +42,45 @@ class AsukaModel(QStandardItemModel):
     def src_path(self) -> Path: return self._src_path
 
     def add_to_queue(self, asset_structure):
+        """
+        Add asset structure to the queue for processing.
+
+        :param asset_structure: A dictionary where the top level keys are the asset names.
+                                The values are dictionaries where the keys are the asset group names and the values are lists of asset file names.
+        """
         log.info(f'Add to queue: {asset_structure}')
         self._queue.append(asset_structure)
 
     def process_queue(self):
+        """
+        Process asset structure queue. If the queue is not empty, it will take the first item and add it to the model.
+
+        This method is connected to a QTimer with 50ms interval.
+        """
         if self._queue:
             log.info(f'Process queue: {self._queue}')
             asset_structure = self._queue.pop(0)
             self.add_asset_item(asset_structure)
 
     def add_asset_item(self, asset_structure):
+        """
+        Add a new asset item to the model.
+
+        The asset item is a hierarchical structure of QStandardItem.
+        The root item is the asset name.
+        The children of the root item are the asset group names.
+        The children of the group items are the asset file names.
+
+        The asset file items have the following data:
+
+            - const.ItemData.NAME: The name of the asset file without extension
+            - const.ItemData.EXT: The extension of the asset file
+            - const.ItemData.FILENAME: The full name of the asset file
+            - const.ItemData.FILEPATH: The full path of the asset file
+
+        :param asset_structure: A dictionary where the top level keys are the asset names.
+                                The values are dictionaries where the keys are the asset group names and the values are lists of asset file names.
+        """
         for k, v in asset_structure.items():
             # asset root item
             root_item = QStandardItem(k)
@@ -73,6 +102,15 @@ class AsukaModel(QStandardItemModel):
             self.appendRow(root_item)
 
     def find_item_by_name(self, asset_name: str) -> Union[QStandardItem, None]:
+        """
+        Find a QStandardItem with the given asset name.
+
+        Iterate through all the root items and check if the text of each item matches the given asset name.
+        If a match is found, return the item. Otherwise, return None.
+
+        :param asset_name: The name of the asset to find
+        :return: The QStandardItem with the given asset name, or None if not found
+        """
         for row in range(self.rowCount()):
             item = self.item(row)
             if item.text() == asset_name:
@@ -80,6 +118,15 @@ class AsukaModel(QStandardItemModel):
         return None
 
     def get_files_item_by_asset_item(self, asset_item: QStandardItem) -> Generator[QStandardItem, None, None]:
+        """
+        Get the QStandardItem of all asset files under the given asset item.
+
+        This will iterate through all the children of the given asset item and yield the QStandardItem of each file if it has children.
+        The yielded item is a QStandardItem which contains the file name, extension, file path, etc. in its data role.
+
+        :param asset_item: The asset item to get the files from
+        :return: A generator of all asset file QStandardItem
+        """
         for row in range(self.rowCount()):
             item = asset_item.child(row)
             if item:
@@ -89,15 +136,43 @@ class AsukaModel(QStandardItemModel):
                         yield child_item
 
     def get_files_path_by_asset_item(self, asset_item: QStandardItem) -> Generator[Path, None, None]:
+        """
+        Get the paths of all asset files under the given asset item.
+
+        :param asset_item: The asset item to get the files from
+        :return: A generator of all asset file paths
+        """
         for each_item in self.get_files_item_by_asset_item(asset_item):
             yield Path(each_item.data(const.ItemData.FILEPATH))
 
     def get_files_name_by_asset_item(self, asset_item: QStandardItem) -> Generator[str, None, None]:
+        """
+        Get the names of all asset files under the given asset item.
+
+        :param asset_item: The asset item to get the files from
+        :return: A generator of all asset file names
+        """
         for each_item in self.get_files_item_by_asset_item(asset_item):
             yield each_item.data(const.ItemData.FILENAME)
 
     @staticmethod
     def get_asset_structure_by_asset_item(asset_item: QStandardItem) -> Dict:
+        """
+        Get asset structure by asset item.
+
+        The asset structure is a dictionary where the top level keys are the asset names.
+        The values are dictionaries where the keys are the asset group names and the values are lists of asset file names.
+
+        The structure is as follows:
+        {
+            'asset_name': {
+                'group_name': ['file1', 'file2', ...]
+            }
+        }
+
+        :param asset_item: The asset item to get the structure from
+        :return: The asset structure as a dictionary
+        """
         result = {}
         if asset_item.hasChildren():
             result[asset_item.text()] = {}
@@ -177,6 +252,17 @@ class AmaterasuModel(AsukaModel):
 
 @deco.validate_directory
 def create_dsdb_model(dir_path: Union[PathLike, Path]) -> AsukaModel:
+    """
+    Creates an AsukaModel from a DSDB directory.
+
+    Given a directory path that is a valid DSDB directory,
+    creates an AsukaModel object from the metadata and description information
+    in the directory.
+
+    :param dir_path: The directory path of the DSDB directory
+    :return: An AsukaModel object containing the DSDB metadata and description
+    :raises err.InvalidDSDBDirectory: If the directory path is not a valid DSDB directory
+    """
     if not core.is_dsdb_directory(dir_path):
         raise err.InvalidDSDBDirectory(f'Invalid DSDB directory: {dir_path}')
     model = AsukaModel(dir_path)
@@ -185,6 +271,17 @@ def create_dsdb_model(dir_path: Union[PathLike, Path]) -> AsukaModel:
 
 @deco.validate_directory
 def create_project_mods_model(dir_path: Union[PathLike, Path]) -> AmaterasuModel:
+    """
+    Creates an AmaterasuModel from a project mods directory.
+
+    Given a directory path that is a valid project mods directory,
+    creates an AmaterasuModel object from the metadata and description
+    information in the directory.
+
+    :param dir_path: The directory path of the project mods directory
+    :return: An AmaterasuModel object containing the project mods metadata and description
+    :raises err.InvalidProjectModsDirectory: If the directory path is not a valid project mods directory
+    """
     if not core.is_project_mods_directory(dir_path):
         raise err.InvalidProjectModsDirectory(f'Invalid project mods directory: {dir_path}')
     metadata = core.read_metadata_mods(dir_path / 'METADATA.json')
@@ -195,6 +292,17 @@ def create_project_mods_model(dir_path: Union[PathLike, Path]) -> AmaterasuModel
 
 @deco.validate_directory
 def create_game_data_model(dir_path: Union[PathLike, Path]) -> Union[AsukaModel, AmaterasuModel]:
+    """
+    Creates an AsukaModel or AmaterasuModel from a game data directory.
+
+    Given a directory path that is a valid DSDB directory or a valid project mods directory,
+    creates an AsukaModel or AmaterasuModel object from the metadata and description information
+    in the directory.
+
+    :param dir_path: The directory path of the game data directory
+    :return: An AsukaModel or AmaterasuModel object containing the game data metadata and description
+    :raises err.InvalidGameDataDirectory: If the directory path is not a valid DSDB directory nor a valid project mods directory
+    """
     if core.is_dsdb_directory(dir_path):
         model = create_dsdb_model(dir_path)
     elif core.is_project_mods_directory(dir_path):

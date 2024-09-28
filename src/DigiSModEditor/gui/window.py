@@ -90,9 +90,8 @@ class MainWindow(QMainWindow):
 
     @staticmethod
     def scan_project_contents(scanner: th.ScannerThread):
-        current_time = time.time()
-        rescan_delay = 120 # 2 Minute
-        if current_time - scanner.last_scan_time < rescan_delay or scanner.last_scan_time == 0:
+        rescan_delay = time.time() - scanner.last_scan_time < 120 # 2 Minute
+        if rescan_delay or scanner.last_scan_time == 0:
             if scanner.isRunning():
                 scanner.stop()
             scanner.start()
