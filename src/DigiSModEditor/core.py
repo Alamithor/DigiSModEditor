@@ -348,7 +348,7 @@ def pack_project_mods(project_mods_dir: Union[PathLike, Path], dest_dir: Union[P
     :raises InvalidProjectModsDirectory: If `project_mods_dir` is not a valid project mods directory
     """
     if not is_project_mods_directory(project_mods_dir):
-        raise err.InvalidProjectModsDirectory(f'Directory is not project mods directory: {project_mods_dir}')
+        raise err.InvalidModsDirectory(f'Directory is not project mods directory: {project_mods_dir}')
     zip_file_path = dest_dir / zip_file_name
 
     with zipfile.ZipFile(zip_file_path, 'w') as zip_file:

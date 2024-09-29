@@ -22,8 +22,8 @@ class InvalidDSDBDirectory(BaseDigiSException):
         self.message = f'{message}. {info}'
 
 
-class InvalidProjectModsDirectory(BaseDigiSException):
-    """Raised when the specified directory is not valid project mods directory."""
+class InvalidModsDirectory(BaseDigiSException):
+    """Raised when the specified directory is not valid mods directory."""
     def __init__(self, message: str):
         info = 'The directory does not contain a valid METADATA.json file and modfiles subdirectory.'
         self.message = f'{message}. {info}'

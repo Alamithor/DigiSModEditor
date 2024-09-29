@@ -55,14 +55,15 @@ class MainWindow(QMainWindow):
         splitter: QSplitter = self.ui(UIP.SPLITTER)
         splitter.setSizes([1, self._ui.size().width() - 260])
 
+        # connect left panel signals
+        self.ui(UIP.PROJECT_DIR_TXT).textChanged.connect(self.populate_mods_list)
         self.ui(UIP.PROJECT_DIR_TXT).setText(str(utl.get_default_project_mods_dir()))
-        self.ui(UIP.PROJECT_DIR_BTN).clicked.connect(self.browse_directory)
+        self.ui(UIP.PROJECT_DIR_BTN).clicked.connect(self.browse_project_directory)
         self.ui(UIP.MODS_DROPDOWN).currentIndexChanged.connect(self.mods_dropdown_index_changed)
         self.ui(UIP.MODS_CREATE_BTN).clicked.connect(self.create_project_mods)
         self.ui(UIP.MODS_EDIT_BTN).toggled.connect(self.edit_project_mods)
-
-        log.info('Populating project mods list')
-        self.populate_mods_list()
+        # connect setup tab signals
+        self.ui(UIP.DSDB_DIR_BTN).clicked.connect(self.browse_dsdb_directory)
 
         # start thread
         for mods_name, data in self._mods_model_data.items():
@@ -82,11 +83,17 @@ class MainWindow(QMainWindow):
 
         return ui_widget
 
-    def browse_directory(self):
-        directory = QFileDialog.getExistingDirectory(self, "Select Directory")
+    def browse_project_directory(self):
+        directory = QFileDialog.getExistingDirectory(self, "Select Project Directory")
         log.info(f"Selected directory: {directory}")
         if directory:
-            self._ui.left_panel_ui.mods_dir_text.setText(f"{directory}")
+            self.ui(UIP.PROJECT_DIR_TXT).setText(f"{directory}")
+
+    def browse_dsdb_directory(self):
+        directory = QFileDialog.getExistingDirectory(self, "Select DSDB Directory")
+        log.info(f"Selected directory: {directory}")
+        if directory:
+            self.ui(UIP.DSDB_DIR_TXT).setText(f"{directory}")
 
     @staticmethod
     def scan_project_contents(scanner: th.ScannerThread):
@@ -117,7 +124,7 @@ class MainWindow(QMainWindow):
         index = mods_dd.count() + 1
         try:
             new_project_mods = models.create_project_mods_model(dir_path)
-        except err.InvalidProjectModsDirectory as e:
+        except err.InvalidModsDirectory as e:
             log.error(e)
             return -1
 
@@ -128,6 +135,9 @@ class MainWindow(QMainWindow):
 
     def populate_mods_list(self):
         project_mods_dir = Path(self.ui(UIP.PROJECT_DIR_TXT).text())
+        if not project_mods_dir.is_dir():
+            raise err.InvalidDirectoryPath(f'Invalid directory path: {project_mods_dir}')
+
         mods_dd: QComboBox = self.ui(UIP.MODS_DROPDOWN)
         log.info(f'Populating mods list: {project_mods_dir}')
         mods_dd.clear()

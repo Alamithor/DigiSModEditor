@@ -283,7 +283,7 @@ def create_project_mods_model(dir_path: Union[PathLike, Path]) -> AmaterasuModel
     :raises err.InvalidProjectModsDirectory: If the directory path is not a valid project mods directory
     """
     if not core.is_project_mods_directory(dir_path):
-        raise err.InvalidProjectModsDirectory(f'Invalid project mods directory: {dir_path}')
+        raise err.InvalidModsDirectory(f'Invalid project mods directory: {dir_path}')
     metadata = core.read_metadata_mods(dir_path / 'METADATA.json')
     description = core.read_description_mods(dir_path / 'DESCRIPTION.html')
     model = AmaterasuModel(dir_path / 'modfiles', metadata, description)
