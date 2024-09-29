@@ -48,7 +48,7 @@ class AsukaModel(QStandardItemModel):
         :param asset_structure: A dictionary where the top level keys are the asset names.
                                 The values are dictionaries where the keys are the asset group names and the values are lists of asset file names.
         """
-        log.info(f'Add to queue: {asset_structure}')
+        log.debug(f'Add to queue: {asset_structure}')
         self._queue.append(asset_structure)
 
     def process_queue(self):
@@ -58,8 +58,8 @@ class AsukaModel(QStandardItemModel):
         This method is connected to a QTimer with 50ms interval.
         """
         if self._queue:
-            log.info(f'Process queue: {self._queue}')
             asset_structure = self._queue.pop(0)
+            log.debug(f'Process queue: {self._queue}')
             self.add_asset_item(asset_structure)
 
     def add_asset_item(self, asset_structure):

@@ -66,6 +66,7 @@ class MainWindow(QMainWindow):
         self.ui(UIP.MODS_CREATE_BTN).clicked.connect(self.create_project_mods)
         self.ui(UIP.MODS_EDIT_BTN).toggled.connect(self.edit_project_mods)
         # connect setup tab signals
+        self.ui(UIP.DSDB_DIR_TXT).textChanged.connect(self.populate_source_asset)
         self.ui(UIP.DSDB_DIR_BTN).clicked.connect(self.browse_dsdb_directory)
 
         # start thread
@@ -96,6 +97,8 @@ class MainWindow(QMainWindow):
         directory = QFileDialog.getExistingDirectory(self, "Select DSDB Directory")
         log.info(f"Selected directory: {directory}")
         if directory:
+            if not core.is_dsdb_directory(Path(directory)):
+                raise err.InvalidDSDBDirectory(f'Invalid DSDB directory: {directory}')
             self.ui(UIP.DSDB_DIR_TXT).setText(f"{directory}")
 
     @staticmethod
@@ -293,6 +296,11 @@ class MainWindow(QMainWindow):
             'asset_model': dsdb_model,
             'thread': new_scanner,
         }
+        new_scanner.asset_file_found.connect(dsdb_model.add_to_queue)
+        self.scan_project_contents(new_scanner)
+
+        self.ui(UIP.DSDB_ASSET_TV).setModel(dsdb_model)
+
         self._dsdb_model_data['DSDB'] = new_data
 
 
