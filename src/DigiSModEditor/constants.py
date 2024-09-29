@@ -45,3 +45,9 @@ class UiPath(StrEnum):
     MODS_CREATE_BTN = f'{L_PANEL}.mods_create_btn'
     # Mods assets
     MODS_ASSET_TV = f'{L_PANEL}.mods_asset_tv'
+
+    # Main tab
+    # Setup tab
+    SETUP_TAB = f'setup_tab_ui'
+    DSDB_DIR_TXT = f'{SETUP_TAB}.dsdb_dir_text'
+    DSDB_DIR_BTN = f'{SETUP_TAB}.dsdb_dir_btn'

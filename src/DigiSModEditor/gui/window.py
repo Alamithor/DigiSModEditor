@@ -55,7 +55,7 @@ class MainWindow(QMainWindow):
         splitter: QSplitter = self.ui(UIP.SPLITTER)
         splitter.setSizes([1, self._ui.size().width() - 260])
 
-        self.ui(UIP.MODS_DIR_TXT).setText(str(utl.get_default_project_dir()))
+        self.ui(UIP.MODS_DIR_TXT).setText(str(utl.get_default_preference_dir()))
         self.ui(UIP.MODS_DIR_BTN).clicked.connect(self.browse_directory)
         self.ui(UIP.MODS_DROPDOWN).currentIndexChanged.connect(self.mods_dropdown_index_changed)
         self.ui(UIP.MODS_CREATE_BTN).clicked.connect(self.create_project_mods)
@@ -127,14 +127,15 @@ class MainWindow(QMainWindow):
         return index
 
     def populate_mods_list(self):
-        root_mods_dir = Path(self.ui(UIP.MODS_DIR_TXT).text())
+        root_project_dir = Path(self.ui(UIP.MODS_DIR_TXT).text())
+        project_mods_dir = utl.get_packed_mods_dir(root_project_dir)
         mods_dd: QComboBox = self.ui(UIP.MODS_DROPDOWN)
-        log.info(f'Populating mods list: {root_mods_dir}')
+        log.info(f'Populating mods list: {project_mods_dir}')
         mods_dd.clear()
 
         log.info(f'Adding default: -- New --')
         mods_dd.addItem('-- New --')
-        for each_dir in root_mods_dir.iterdir():
+        for each_dir in project_mods_dir.iterdir():
             if each_dir.is_dir():
                 log.info(f'Adding: {each_dir.name}')
                 self._add_new_mods(each_dir.name, each_dir)
