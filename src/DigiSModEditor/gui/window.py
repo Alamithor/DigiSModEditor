@@ -35,6 +35,7 @@ class MainWindow(QMainWindow):
         self._ui.setup_tab_ui = loader.load_ui(setup_tab_ui_file)
         self._ui.asset_tab_ui = loader.load_ui(asset_tab_ui_file)
         self._mods_model_data = {}
+        self._dsdb_model_data = {}
 
         # Left panel
         left_lay = QVBoxLayout(self._ui.left_panel)
@@ -277,6 +278,20 @@ class MainWindow(QMainWindow):
 
         for wgt in meta_ui_data:
             wgt.setReadOnly(read_only)
+
+    def populate_source_asset(self):
+        dsdb_txt: QLineEdit = self.ui(UIP.DSDB_DIR_TXT)
+        dsdb_dir: Path = Path(dsdb_txt.text())
+        if not dsdb_dir.is_dir():
+            raise err.InvalidDirectoryPath(f'Invalid directory path: {dsdb_dir}')
+
+        dsdb_model = models.create_dsdb_model(dsdb_dir)
+        new_scanner = th.ScannerThread(dsdb_model.src_path)
+        new_data = {
+            'asset_model': dsdb_model,
+            'thread': new_scanner,
+        }
+        self._dsdb_model_data['DSDB'] = new_data
 
 
 # TODO: more logs in core, and gui
