@@ -4,9 +4,11 @@ from os import PathLike
 from pathlib import Path
 from typing import Union
 
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QStandardItem
 from PySide6.QtWidgets import (
     QMainWindow, QVBoxLayout, QFileDialog, QComboBox, QLineEdit, QDoubleSpinBox,
-    QSplitter, QPushButton, QToolButton, QTextEdit, QTreeView,
+    QSplitter, QPushButton, QToolButton, QTextEdit, QTreeView, QSpinBox,
 )
 
 from . import widgets, models
@@ -35,7 +37,7 @@ class MainWindow(QMainWindow):
         self._ui.setup_tab_ui = loader.load_ui(setup_tab_ui_file)
         self._ui.transfer_tab_ui = loader.load_ui(transfer_tab_ui_file)
         self._mods_model_data = {}
-        self._dsdb_model_data = {}
+        self._asset_src_model_data = {}
 
         # Left panel
         left_lay = QVBoxLayout(self._ui.left_panel)
@@ -53,16 +55,16 @@ class MainWindow(QMainWindow):
         transfer_lay.addWidget(self._ui.transfer_tab_ui)
 
         # Rearrange splitter
-        panel_split: QSplitter = self.ui(UIP.PANEL_SPLITTER)
+        panel_split: QSplitter = self.ui(UIP.PANEL_SPLIT)
         panel_split.setSizes([1, self._ui.size().width() - 260])
-        transfer_split: QSplitter = self.ui(UIP.TRANSFER_SPLITTER)
+        transfer_split: QSplitter = self.ui(UIP.TRANS_SPLIT)
         transfer_split.setSizes([1, self._ui.transfer_tab_ui.size().width() - 540])
 
         # connect left panel signals
         self.ui(UIP.PROJECT_DIR_TXT).textChanged.connect(self.populate_mods_list)
+        self.ui(UIP.MODS_DROPDOWN).currentIndexChanged.connect(self.mods_dropdown_index_changed)
         self.ui(UIP.PROJECT_DIR_TXT).setText(str(utl.get_default_project_mods_dir()))
         self.ui(UIP.PROJECT_DIR_BTN).clicked.connect(self.browse_project_directory)
-        self.ui(UIP.MODS_DROPDOWN).currentIndexChanged.connect(self.mods_dropdown_index_changed)
         self.ui(UIP.MODS_CREATE_BTN).clicked.connect(self.create_project_mods)
         self.ui(UIP.MODS_EDIT_BTN).toggled.connect(self.edit_project_mods)
         # connect setup tab signals
@@ -101,6 +103,35 @@ class MainWindow(QMainWindow):
                 raise err.InvalidDSDBDirectory(f'Invalid DSDB directory: {directory}')
             self.ui(UIP.DSDB_DIR_TXT).setText(f"{directory}")
 
+    def src_asset_selection_counter(self, top_left, bottom_right, roles):
+        if Qt.CheckStateRole in roles:
+            asset_src_data = self._asset_src_model_data.get('DSDB', {})
+            asset_src_model: Union[models.AsukaModel, None] = asset_src_data.get('asset_model', None)
+            if asset_src_model is None:
+                return
+            counter_ui: QSpinBox = self.ui(UIP.TRANS_SELECT_COUNTER)
+            asset_src_tv: QTreeView = self.ui(UIP.SRC_ASSET_TV)
+
+            # Change check state on selection
+            selected_indexes = asset_src_tv.selectedIndexes()
+            item_state = asset_src_model.itemFromIndex(top_left).checkState()
+            for index in selected_indexes:
+                selected_item: QStandardItem = asset_src_model.itemFromIndex(index)
+                if selected_item.isCheckable():
+                    selected_item.setCheckState(item_state)
+
+            # Update checked counter
+            temp_index_list = []
+            for i in range(asset_src_model.invisibleRootItem().rowCount()):
+                child = asset_src_model.invisibleRootItem().child(i)
+                if child.checkState() == Qt.Checked:
+                    temp_index_list.append(i)
+
+            asset_src_data['checked_index_list'] = temp_index_list
+            counter = len(temp_index_list)
+            counter_ui.setValue(counter)
+            log.info(f'Asset checked counter: {counter}')
+
     @staticmethod
     def scan_project_contents(scanner: th.ScannerThread):
         rescan_delay = time.time() - scanner.last_scan_time < 120 # 2 Minute
@@ -114,6 +145,7 @@ class MainWindow(QMainWindow):
         new_data = {
             'asset_model': asset_model,
             'thread': new_scanner,
+            'checked_index_list': []
         }
         new_scanner.asset_file_found.connect(asset_model.add_to_queue)
 
@@ -171,11 +203,13 @@ class MainWindow(QMainWindow):
         mods_title = mods_dd.itemText(index)
         proj_mods_model = self._get_mods_model(mods_title)
         if proj_mods_model is None:
+            log.info('Cannot find mods information, entering create mode')
             # Create MODE
             read_only = False
             create_btn.setVisible(True)
             edit_btn.setVisible(False)
         else:
+            log.info('Mods information found, entering edit mode')
             # Edit Mode
             read_only = True
             create_btn.setVisible(False)
@@ -295,13 +329,15 @@ class MainWindow(QMainWindow):
         new_data = {
             'asset_model': dsdb_model,
             'thread': new_scanner,
+            'checked_index_list': [],
         }
         new_scanner.asset_file_found.connect(dsdb_model.add_to_queue)
         self.scan_project_contents(new_scanner)
 
-        self.ui(UIP.DSDB_ASSET_TV).setModel(dsdb_model)
+        self.ui(UIP.SRC_ASSET_TV).setModel(dsdb_model)
+        dsdb_model.dataChanged.connect(self.src_asset_selection_counter)
 
-        self._dsdb_model_data['DSDB'] = new_data
+        self._asset_src_model_data['DSDB'] = new_data
 
 
 # TODO: more logs in core, and gui

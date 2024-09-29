@@ -93,7 +93,7 @@
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_5">
           <item>
-           <widget class="QSpinBox" name="spinBox">
+           <widget class="QSpinBox" name="transfer_selection_counter">
             <property name="frame">
              <bool>false</bool>
             </property>
@@ -104,7 +104,7 @@
              <enum>QAbstractSpinBox::NoButtons</enum>
             </property>
             <property name="suffix">
-             <string> Selected</string>
+             <string> Asset Checked</string>
             </property>
            </widget>
           </item>
@@ -112,7 +112,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton">
+        <widget class="QPushButton" name="transfer_copy_btn">
          <property name="text">
           <string>Copy to Mods</string>
          </property>

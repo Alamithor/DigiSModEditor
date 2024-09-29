@@ -23,7 +23,7 @@ class UiPath(StrEnum):
     MAIN = ''
 
     # Main
-    PANEL_SPLITTER = 'panel_splitter'
+    PANEL_SPLIT = 'panel_splitter'
 
     # Left panel
     L_PANEL = 'left_panel_ui'
@@ -53,6 +53,8 @@ class UiPath(StrEnum):
     DSDB_DIR_TXT = f'{SETUP_TAB}.dsdb_dir_text'
     DSDB_DIR_BTN = f'{SETUP_TAB}.dsdb_dir_btn'
     # Transfer tab
-    TRANSFER_TAB = 'transfer_tab_ui'
-    TRANSFER_SPLITTER = f'{TRANSFER_TAB}.transfer_splitter'
-    DSDB_ASSET_TV = f'{TRANSFER_TAB}.dsdb_asset_tv'
+    TRANS_TAB = 'transfer_tab_ui'
+    TRANS_SPLIT = f'{TRANS_TAB}.transfer_splitter'
+    SRC_ASSET_TV = f'{TRANS_TAB}.dsdb_asset_tv'
+    TRANS_SELECT_COUNTER = f'{TRANS_TAB}.transfer_selection_counter'
+    TRANS_COPY_BTN = f'{TRANS_TAB}.transfer_copy_btn'
