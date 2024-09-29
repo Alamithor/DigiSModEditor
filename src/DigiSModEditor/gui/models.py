@@ -176,10 +176,11 @@ class AsukaModel(QStandardItemModel):
         """
         result = {}
         if asset_item.hasChildren():
-            result[asset_item.text()] = {}
+            temp_data = {}
             for row_group in range(asset_item.rowCount()):
                 item_grp = asset_item.child(row_group)
-                result[item_grp.text()] = [item_grp.child(row).text() for row in range(item_grp.rowCount())]
+                temp_data[item_grp.text()] = [item_grp.child(row).text() for row in range(item_grp.rowCount())]
+            result[asset_item.text()] = temp_data
         return result
 
 

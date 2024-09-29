@@ -70,6 +70,8 @@ class MainWindow(QMainWindow):
         # connect setup tab signals
         self.ui(UIP.DSDB_DIR_TXT).textChanged.connect(self.populate_source_asset)
         self.ui(UIP.DSDB_DIR_BTN).clicked.connect(self.browse_dsdb_directory)
+        # connect transfer tab signals
+        self.ui(UIP.TRANS_COPY_BTN).clicked.connect(self.copy_src_asset_to_mods)
 
         # start thread
         for mods_name, data in self._mods_model_data.items():
@@ -338,6 +340,31 @@ class MainWindow(QMainWindow):
         dsdb_model.dataChanged.connect(self.src_asset_selection_counter)
 
         self._asset_src_model_data['DSDB'] = new_data
+
+    def copy_src_asset_to_mods(self):
+        src_data = self._asset_src_model_data.get('DSDB', {})
+        src_model: Union[models.AsukaModel, None] = src_data.get('asset_model', None)
+        if src_model is None:
+            raise err.CopyAssetError('Cannot find source asset information')
+
+        mods_dd: QComboBox = self.ui(UIP.MODS_DROPDOWN)
+        mods_title = mods_dd.currentText()
+        tgt_data = self._mods_model_data.get(mods_title, {})
+        tgt_model: Union[models.AmaterasuModel, None] = tgt_data.get('asset_model', None)
+        if tgt_model is None:
+            raise err.CopyAssetError(f'Cannot find mods information: {mods_title}')
+
+        selection_checked_list = src_data.get('checked_index_list', [])
+        for i in selection_checked_list:
+            src_item: QStandardItem = src_model.invisibleRootItem().child(i)
+            for file_name in src_model.get_files_name_by_asset_item(src_item):
+                copy_result = core.copy_asset_file(src_model.src_path, tgt_model.src_path, file_name)
+                log.info(copy_result.message)
+
+            src_structure = src_model.get_asset_structure_by_asset_item(src_item)
+            tgt_model.add_asset_item(src_structure)
+
+            src_item.setCheckState(Qt.Unchecked)
 
 
 # TODO: more logs in core, and gui
