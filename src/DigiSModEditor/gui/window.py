@@ -27,13 +27,13 @@ class MainWindow(QMainWindow):
         main_ui_file = utl.get_ui_file('main_window')
         left_panel_ui_file = utl.get_ui_file('project_mods_widget')
         setup_tab_ui_file = utl.get_ui_file('setup_widget')
-        asset_tab_ui_file = utl.get_ui_file('asset_transfer_widget')
+        transfer_tab_ui_file = utl.get_ui_file('asset_transfer_widget')
 
         # assign _ui attributes
         self._ui = loader.load_ui(main_ui_file, self)
         self._ui.left_panel_ui = loader.load_ui(left_panel_ui_file)
         self._ui.setup_tab_ui = loader.load_ui(setup_tab_ui_file)
-        self._ui.asset_tab_ui = loader.load_ui(asset_tab_ui_file)
+        self._ui.transfer_tab_ui = loader.load_ui(transfer_tab_ui_file)
         self._mods_model_data = {}
         self._dsdb_model_data = {}
 
@@ -47,14 +47,16 @@ class MainWindow(QMainWindow):
         create_lay.setContentsMargins(0, 0, 0, 0)
         create_lay.addWidget(self._ui.setup_tab_ui)
 
-        # Asset Tab
-        asset_lay = QVBoxLayout(self._ui.asset_tab)
-        asset_lay.setContentsMargins(0, 0, 0, 0)
-        asset_lay.addWidget(self._ui.asset_tab_ui)
+        # Transfer Tab
+        transfer_lay = QVBoxLayout(self._ui.transfer_tab)
+        transfer_lay.setContentsMargins(0, 0, 0, 0)
+        transfer_lay.addWidget(self._ui.transfer_tab_ui)
 
         # Rearrange splitter
-        splitter: QSplitter = self.ui(UIP.SPLITTER)
-        splitter.setSizes([1, self._ui.size().width() - 260])
+        panel_split: QSplitter = self.ui(UIP.PANEL_SPLITTER)
+        panel_split.setSizes([1, self._ui.size().width() - 260])
+        transfer_split: QSplitter = self.ui(UIP.TRANSFER_SPLITTER)
+        transfer_split.setSizes([1, self._ui.transfer_tab_ui.size().width() - 540])
 
         # connect left panel signals
         self.ui(UIP.PROJECT_DIR_TXT).textChanged.connect(self.populate_mods_list)

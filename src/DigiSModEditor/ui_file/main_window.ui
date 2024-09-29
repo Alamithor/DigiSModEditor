@@ -57,7 +57,7 @@
          <string>Setup</string>
         </attribute>
        </widget>
-       <widget class="QWidget" name="asset_tab">
+       <widget class="QWidget" name="transfer_tab">
         <attribute name="title">
          <string>Transfer</string>
         </attribute>
