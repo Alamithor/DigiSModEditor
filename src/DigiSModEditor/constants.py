@@ -27,9 +27,10 @@ class UiPath(StrEnum):
 
     # Left panel
     L_PANEL = 'left_panel_ui'
+    # Root project dir
+    PROJECT_DIR_TXT = f'{L_PANEL}.project_dir_text'
+    PROJECT_DIR_BTN = f'{L_PANEL}.project_dir_btn'
     # Mods dir path
-    MODS_DIR_TXT = f'{L_PANEL}.mods_dir_text'
-    MODS_DIR_BTN = f'{L_PANEL}.mods_dir_btn'
     MODS_DROPDOWN = f'{L_PANEL}.mods_dropdown'
     # Mods group
     MODS_META_GRP = f'{L_PANEL}.metadata_grpbox'

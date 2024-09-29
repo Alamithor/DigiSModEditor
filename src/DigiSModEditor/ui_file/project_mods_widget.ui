@@ -45,7 +45,7 @@
        <number>6</number>
       </property>
       <item>
-       <widget class="QLineEdit" name="mods_dir_text">
+       <widget class="QLineEdit" name="project_dir_text">
         <property name="minimumSize">
          <size>
           <width>100</width>
@@ -55,7 +55,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="mods_dir_btn">
+       <widget class="QPushButton" name="project_dir_btn">
         <property name="maximumSize">
          <size>
           <width>40</width>
@@ -366,8 +366,8 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>mods_dir_text</tabstop>
-  <tabstop>mods_dir_btn</tabstop>
+  <tabstop>project_dir_text</tabstop>
+  <tabstop>project_dir_btn</tabstop>
   <tabstop>mods_dropdown</tabstop>
   <tabstop>tabWidget</tabstop>
   <tabstop>scrollArea</tabstop>

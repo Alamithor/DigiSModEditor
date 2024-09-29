@@ -35,14 +35,16 @@ def get_ui_file(ui_name: str) -> Path:
     return get_ui_dir() / f'{ui_name}.ui'
 
 
-def get_default_preference_dir() -> Path:
+def get_app_dir() -> Path:
     """
-    Returns the default directory where the preferences will be stored.
+    Returns the directory where the application specific data is stored.
 
-    The default directory is a directory in the user's home directory, in the 'Documents' folder,
-    with the name 'DigiSModEditor'. If the directory does not exist, it will be created.
+    The directory is a folder in the user's home directory, in the 'Documents' folder, with the name
+    'DigiSModEditor'. If the directory does not exist, it will be created.
 
-    :return: The default directory where the preferences will be stored
+    This directory is used to store the project mods and packed mods.
+
+    :return: The directory where the application specific data is stored
     """
     pref_dir = Path.home() / 'Documents' / 'DigiSModEditor'
     if not pref_dir.exists():
@@ -50,43 +52,33 @@ def get_default_preference_dir() -> Path:
     return pref_dir
 
 
-def get_project_mods_dir(root_dir: Union[PathLike, Path] = None) -> Path:
+def get_default_project_mods_dir() -> Path:
     """
-    Returns the directory where the project mods are stored.
+    Returns the default directory where the project mods are stored.
 
-    If the root directory is not specified, the default directory will be used. The default directory
-    is a directory in the user's home directory, in the 'Documents' folder, with the name
-    'DigiSModEditor'. If the directory does not exist, it will be created.
+    The default directory is a folder in the user's home directory, in the 'Documents' folder,
+    with the name 'DigiSModEditor' -> 'ProjectMods'. If the directory does not exist, it will be
+    created.
 
-    The project mods directory will be created if it does not exist.
-
-    :param root_dir: The root directory where the project mods are stored
-    :return: The directory where the project mods are stored
+    :return: The default directory where the project mods are stored
     """
-    if root_dir is None:
-        root_dir = get_default_preference_dir()
-    project_dir = root_dir / 'Mods'
+    project_dir = get_app_dir() / 'ProjectMods'
     if not project_dir.exists():
         project_dir.mkdir(parents=True)
     return project_dir
 
 
-def get_packed_mods_dir(root_dir: Union[PathLike, Path] = None) -> Path:
+def get_default_packed_mods_dir() -> Path:
     """
-    Returns the directory where the packed mods are stored.
+    Returns the default directory where the packed mods are stored.
 
-    If the root directory is not specified, the default directory will be used. The default directory
-    is a directory in the user's home directory, in the 'Documents' folder, with the name
-    'DigiSModEditor'. If the directory does not exist, it will be created.
+    The default directory is a folder in the user's home directory, in the 'Documents' folder,
+    with the name 'DigiSModEditor' -> 'PackedMods'. If the directory does not exist, it will be
+    created.
 
-    The packed mods directory will be created if it does not exist.
-
-    :param root_dir: The root directory where the packed mods are stored
-    :return: The directory where the packed mods are stored
+    :return: The default directory where the packed mods are stored
     """
-    if root_dir is None:
-        root_dir = get_default_preference_dir()
-    packed_mods_dir = root_dir / 'PackedMods'
+    packed_mods_dir = get_app_dir() / 'PackedMods'
     if not packed_mods_dir.exists():
         packed_mods_dir.mkdir(parents=True)
     return packed_mods_dir
