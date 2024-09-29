@@ -308,4 +308,6 @@ class MainWindow(QMainWindow):
 # TODO: duplicate code need to be addressed
 # TODO: doesn't support mods title change
 # TODO: user pop up dialog error or warning
+# FIXME: when you browse directory, you need to compare old path and new path.
+#  then flush model datas, before that stop all scanner first.
 

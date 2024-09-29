@@ -84,6 +84,7 @@ class AsukaModel(QStandardItemModel):
         for k, v in asset_structure.items():
             # asset root item
             root_item = QStandardItem(k)
+            root_item.setCheckable(True)
 
             for child_grp, child_list in v.items():
                 # asset group item
