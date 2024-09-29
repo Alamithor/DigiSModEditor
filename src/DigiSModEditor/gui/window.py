@@ -196,7 +196,9 @@ class MainWindow(QMainWindow):
         root_dir_path = Path(dir_path.text())
         mods_dir_path = root_dir_path / mods_title
 
-        log.info('Checking title, author, and version fields')
+        log.info('Checking title, author, version fields and project, mods directory')
+        if not root_dir_path.exists():
+            raise err.CreateProjectModsError(f'Project directory doesn\'t exists: {root_dir_path}')
         if title.text() == '' or author.text() == '':
             raise err.CreateProjectModsError('Title or Author field shouldn\'t empty!')
         if version.value() < 0.1:
