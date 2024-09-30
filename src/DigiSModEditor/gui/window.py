@@ -22,6 +22,7 @@ log = logging.getLogger(const.LogName.MAIN)
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.setWindowTitle('DigiS Mod Editor')
 
         try:
             loader = widgets.UiLoader()
@@ -32,6 +33,12 @@ class MainWindow(QMainWindow):
         setup_tab_ui_file = utl.get_ui_file('setup_widget')
         transfer_tab_ui_file = utl.get_ui_file('asset_transfer_widget')
         pack_tab_ui_file = utl.get_ui_file('pack_mods_widget')
+
+        log.debug(f'Ui file: {main_ui_file}, exists: {main_ui_file.exists()}')
+        log.debug(f'Ui file: {left_panel_ui_file}, exists: {left_panel_ui_file.exists()}')
+        log.debug(f'Ui file: {setup_tab_ui_file}, exists: {setup_tab_ui_file.exists()}')
+        log.debug(f'Ui file: {transfer_tab_ui_file}, exists: {transfer_tab_ui_file.exists()}')
+        log.debug(f'Ui file: {pack_tab_ui_file}, exists: {pack_tab_ui_file.exists()}')
 
         # assign _ui attributes
         self._ui = loader.load_ui(main_ui_file, self)

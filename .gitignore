@@ -79,3 +79,6 @@ fabric.properties
 
 .idea/csv-editor.xml
 
+*.spec
+dist/*
+build/*

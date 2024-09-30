@@ -6,7 +6,8 @@ from . import log_manager # To kick start logging
 from . import gui
 from . import constants as const
 
-if __name__ == '__main__':
+
+def main():
     logger = logging.getLogger(const.LogName.MAIN)
     logger.info('DigiSModEditor application started...')
 
@@ -16,3 +17,7 @@ if __name__ == '__main__':
     window.show()
 
     app.exec()
+
+
+if __name__ == '__main__':
+    main()
