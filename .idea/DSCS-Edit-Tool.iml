@@ -4,6 +4,8 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/.venv" />
+      <excludeFolder url="file://$MODULE_DIR$/build" />
+      <excludeFolder url="file://$MODULE_DIR$/dist" />
     </content>
     <content url="file://$MODULE_DIR$/../../../../Project/2024/DigimonStory/original-content/DSDB/data" />
     <content url="file://$MODULE_DIR$/../../../../Project/2024/DigimonStory/original-content/DSDB/text" />

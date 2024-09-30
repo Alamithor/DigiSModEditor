@@ -2,5 +2,5 @@
 
 call .venv\Scripts\Activate.bat
 
-pyinstaller -w --add-data src\DigiSModEditor;.\DigiSModEditor src\DigiSModEditor.py
-REM pyinstaller --onefile -w --add-data src\DigiSModEditor;.\DigiSModEditor src\DigiSModEditor.py
+REM pyinstaller -w --add-data src\DigiSModEditor;.\DigiSModEditor src\DigiSModEditor.py
+pyinstaller --onefile -w --add-data src\DigiSModEditor;.\DigiSModEditor src\DigiSModEditor.py
