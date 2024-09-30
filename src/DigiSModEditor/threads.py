@@ -41,9 +41,9 @@ class ScannerThread(QThread):
 
             if files:
                 files_text = ''
-                # name_list = [o for o in files if o.endswith('.name')]
+                name_list = [o for o in files if o.endswith('.name')]
                 # Dev mode
-                name_list = [o for o in files if o.endswith('.name') and o.startswith('chr')]
+                # name_list = [o for o in files if o.endswith('.name') and o.startswith('chr')]
 
                 if name_list:
                     files_text = ';'.join(files)

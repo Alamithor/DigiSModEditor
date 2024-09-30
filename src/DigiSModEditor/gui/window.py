@@ -97,7 +97,7 @@ class MainWindow(QMainWindow):
         self.populate_mods_list()
 
         # Dev
-        self.ui(UIP.DSDB_DIR_TXT).setText(r'D:\IDrive\Project\2024\DigimonStory\original-content\DSDB')
+        # self.ui(UIP.DSDB_DIR_TXT).setText(r'D:\IDrive\Project\2024\DigimonStory\original-content\DSDB')
 
         # start thread
         for mods_name, data in self._mods_model_data.items():
