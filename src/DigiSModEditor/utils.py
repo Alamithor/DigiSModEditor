@@ -84,6 +84,22 @@ def get_default_packed_mods_dir() -> Path:
     return packed_mods_dir
 
 
+def get_default_log_dir() -> Path:
+    """
+    Returns the default directory where the log files are stored.
+
+    The default directory is a folder in the user's home directory, in the 'Documents' folder,
+    with the name 'DigiSModEditor' -> 'Logs'. If the directory does not exist, it will be
+    created.
+
+    :return: The default directory where the log files are stored
+    """
+    log_dir = get_app_dir() / 'Logs'
+    if not log_dir.exists():
+        log_dir.mkdir(parents=True)
+    return log_dir
+
+
 def float_to_tuple(value: float) -> tuple[int, int]:
     """
     Converts a float to a tuple of two integers.

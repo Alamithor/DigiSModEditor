@@ -1,5 +1,7 @@
 import logging.config
 
+from . import utils as utl
+
 
 logging_config = {
     'version': 1,
@@ -28,7 +30,7 @@ logging_config = {
             'class': 'logging.handlers.RotatingFileHandler',
             'level': 'DEBUG',
             'formatter': 'detailed',
-            'filename': 'DigiSModEditor.log',
+            'filename': utl.get_default_log_dir() / 'DigiSModEditor.log',
             'maxBytes': 10485760,  # 10MB
             'backupCount': 7,
         },
@@ -36,7 +38,7 @@ logging_config = {
             'class': 'logging.handlers.RotatingFileHandler',
             'level': 'DEBUG',
             'formatter': 'simple',
-            'filename': 'DigiSModEditor.threads.log',
+            'filename': utl.get_default_log_dir() / 'DigiSModEditor.threads.log',
             'maxBytes': 3145728,  # 3MB
             'backupCount': 2,
         },
