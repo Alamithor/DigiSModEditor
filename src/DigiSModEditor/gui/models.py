@@ -31,7 +31,7 @@ class AsukaModel(QStandardItemModel):
         self._queue = []
 
         self._timer = QTimer()
-        self._timer.setInterval(50)
+        self._timer.setInterval(5)
         self._timer.timeout.connect(self.process_queue)
         self._timer.start()
 
@@ -96,7 +96,10 @@ class AsukaModel(QStandardItemModel):
                     file_item.setData(name, const.ItemData.NAME)
                     file_item.setData(ext, const.ItemData.EXT)
                     file_item.setData(child_item, const.ItemData.FILENAME)
-                    file_item.setData(os.path.join(self.src_path, child_item), const.ItemData.FILEPATH)
+                    if ext == '.img':
+                        file_item.setData(os.path.join(self.root_path, 'images', child_item), const.ItemData.FILEPATH)
+                    else:
+                        file_item.setData(os.path.join(self.src_path, child_item), const.ItemData.FILEPATH)
                     group_item.appendRow(file_item)
                 root_item.appendRow(group_item)
 

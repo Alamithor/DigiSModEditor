@@ -37,6 +37,7 @@ def get_asset_related_files(asset_name, files_text) -> Dict:
     # r_geo = f'({file_name})' + const.Pattern.GEO
     # r_skel = f'({file_name})' + const.Pattern.SKEL
     r_anim = f'({file_name})' + const.Pattern.ANIM
+    r_img = f'({file_name})' + const.Pattern.IMG
 
     result_data = {
         file_name: {}
@@ -47,11 +48,13 @@ def get_asset_related_files(asset_name, files_text) -> Dict:
     # geo_files = [f'{o_name}.{o_ext}' for (o_name, o_ext) in re.findall(r_geo, files_text)]
     # skel_files = [f'{o_name}.{o_ext}' for (o_name, o_ext) in re.findall(r_skel, files_text)]
     anim_files = [f'{o_name}{o_mid}.{o_ext}' for (o_name, o_mid, o_ext) in re.findall(r_anim, files_text)]
+    img_files = [f'{o_name}{o_mid}.{o_ext}' for (o_name, o_mid, o_ext) in re.findall(r_img, files_text)]
 
     result_data[file_name]['Name'] = [name_file]
     result_data[file_name]['Geometry'] = [geo_file]
     result_data[file_name]['Skeleton'] = [skel_file]
     result_data[file_name]['Animation'] = sorted(anim_files)
+    result_data[file_name]['Image'] = sorted(img_files)
 
     return result_data
 
