@@ -52,9 +52,15 @@ class UiPath(StrEnum):
     SETUP_TAB = 'setup_tab_ui'
     DSDB_DIR_TXT = f'{SETUP_TAB}.dsdb_dir_text'
     DSDB_DIR_BTN = f'{SETUP_TAB}.dsdb_dir_btn'
+    SETUP_PACK_DIR_TXT = f'{SETUP_TAB}.pack_mods_dir_text'
+    SETUP_PACK_DIR_BTN = f'{SETUP_TAB}.pack_mods_dir_btn'
     # Transfer tab
     TRANS_TAB = 'transfer_tab_ui'
     TRANS_SPLIT = f'{TRANS_TAB}.transfer_splitter'
     SRC_ASSET_TV = f'{TRANS_TAB}.dsdb_asset_tv'
     TRANS_SELECT_COUNTER = f'{TRANS_TAB}.transfer_selection_counter'
     TRANS_COPY_BTN = f'{TRANS_TAB}.transfer_copy_btn'
+    # Pack tab
+    PACK_TAB = 'pack_tab_ui'
+    PACKING_BTN = f'{PACK_TAB}.pack_mods_btn'
+    PACK_OPEN_DIR_BTN = f'{PACK_TAB}.pack_open_dir_btn'

@@ -1,4 +1,5 @@
 import logging
+import os
 import time
 from os import PathLike
 from pathlib import Path
@@ -30,12 +31,14 @@ class MainWindow(QMainWindow):
         left_panel_ui_file = utl.get_ui_file('project_mods_widget')
         setup_tab_ui_file = utl.get_ui_file('setup_widget')
         transfer_tab_ui_file = utl.get_ui_file('asset_transfer_widget')
+        pack_tab_ui_file = utl.get_ui_file('pack_mods_widget')
 
         # assign _ui attributes
         self._ui = loader.load_ui(main_ui_file, self)
         self._ui.left_panel_ui = loader.load_ui(left_panel_ui_file)
         self._ui.setup_tab_ui = loader.load_ui(setup_tab_ui_file)
         self._ui.transfer_tab_ui = loader.load_ui(transfer_tab_ui_file)
+        self._ui.pack_tab_ui = loader.load_ui(pack_tab_ui_file)
         self._mods_model_data = {}
         self._asset_src_model_data = {}
 
@@ -54,6 +57,11 @@ class MainWindow(QMainWindow):
         transfer_lay.setContentsMargins(0, 0, 0, 0)
         transfer_lay.addWidget(self._ui.transfer_tab_ui)
 
+        # Pack Tab
+        pack_lay = QVBoxLayout(self._ui.pack_tab)
+        pack_lay.setContentsMargins(0, 0, 0, 0)
+        pack_lay.addWidget(self._ui.pack_tab_ui)
+
         # Rearrange splitter
         panel_split: QSplitter = self.ui(UIP.PANEL_SPLIT)
         panel_split.setSizes([1, self._ui.size().width() - 260])
@@ -63,15 +71,26 @@ class MainWindow(QMainWindow):
         # connect left panel signals
         self.ui(UIP.PROJECT_DIR_TXT).textChanged.connect(self.populate_mods_list)
         self.ui(UIP.MODS_DROPDOWN).currentIndexChanged.connect(self.mods_dropdown_index_changed)
-        self.ui(UIP.PROJECT_DIR_TXT).setText(str(utl.get_default_project_mods_dir()))
         self.ui(UIP.PROJECT_DIR_BTN).clicked.connect(self.browse_project_directory)
         self.ui(UIP.MODS_CREATE_BTN).clicked.connect(self.create_project_mods)
         self.ui(UIP.MODS_EDIT_BTN).toggled.connect(self.edit_project_mods)
+        self.ui(UIP.PROJECT_DIR_TXT).setText(str(utl.get_default_project_mods_dir()))
         # connect setup tab signals
         self.ui(UIP.DSDB_DIR_TXT).textChanged.connect(self.populate_source_asset)
         self.ui(UIP.DSDB_DIR_BTN).clicked.connect(self.browse_dsdb_directory)
+        self.ui(UIP.SETUP_PACK_DIR_BTN).clicked.connect(self.browse_packed_directory)
+        self.ui(UIP.SETUP_PACK_DIR_TXT).setText(str(utl.get_default_packed_mods_dir()))
         # connect transfer tab signals
         self.ui(UIP.TRANS_COPY_BTN).clicked.connect(self.copy_src_asset_to_mods)
+        # connect pack tab signals
+        self.ui(UIP.PACKING_BTN).clicked.connect(self.packing_mods)
+        self.ui(UIP.PACK_OPEN_DIR_BTN).clicked.connect(self.open_pack_mods_dir)
+
+        # populate left panel
+        self.populate_mods_list()
+
+        # Dev
+        self.ui(UIP.DSDB_DIR_TXT).setText(r'D:\IDrive\Project\2024\DigimonStory\original-content\DSDB')
 
         # start thread
         for mods_name, data in self._mods_model_data.items():
@@ -104,6 +123,12 @@ class MainWindow(QMainWindow):
             if not core.is_dsdb_directory(Path(directory)):
                 raise err.InvalidDSDBDirectory(f'Invalid DSDB directory: {directory}')
             self.ui(UIP.DSDB_DIR_TXT).setText(f"{directory}")
+
+    def browse_packed_directory(self):
+        directory = QFileDialog.getExistingDirectory(self, "Select Packed Directory")
+        log.info(f"Selected directory: {directory}")
+        if directory:
+            self.ui(UIP.SETUP_PACK_DIR_TXT).setText(f"{directory}")
 
     def src_asset_selection_counter(self, top_left, bottom_right, roles):
         if Qt.CheckStateRole in roles:
@@ -365,6 +390,30 @@ class MainWindow(QMainWindow):
             tgt_model.add_asset_item(src_structure)
 
             src_item.setCheckState(Qt.Unchecked)
+
+    def packing_mods(self):
+        mods_dd: QComboBox = self.ui(UIP.MODS_DROPDOWN)
+        mods_title = mods_dd.currentText()
+        tgt_data = self._mods_model_data.get(mods_title, {})
+        tgt_model: Union[models.AmaterasuModel, None] = tgt_data.get('asset_model', None)
+        if tgt_model is None:
+            raise err.CopyAssetError(f'Cannot find mods information: {mods_title}')
+
+        pack_dir_ui: QLineEdit = self.ui(UIP.SETUP_PACK_DIR_TXT)
+        pack_dir_path = Path(pack_dir_ui.text())
+        if not pack_dir_path.is_dir():
+            raise err.InvalidDirectoryPath(f'Invalid directory path: {pack_dir_path}')
+
+        core.pack_project_mods(tgt_model.root_path, pack_dir_path, f'{mods_title}.zip')
+
+    def open_pack_mods_dir(self):
+        pack_dir_ui: QLineEdit = self.ui(UIP.SETUP_PACK_DIR_TXT)
+        pack_dir_path = Path(pack_dir_ui.text())
+        if not pack_dir_path.is_dir():
+            raise err.InvalidDirectoryPath(f'Invalid directory path: {pack_dir_path}')
+
+        log.info(f'Opening directory: {pack_dir_path}')
+        os.startfile(pack_dir_path)
 
 
 # TODO: more logs in core, and gui

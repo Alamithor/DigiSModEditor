@@ -82,7 +82,7 @@
             <property name="title">
              <string>DSDB Directory</string>
             </property>
-            <layout class="QHBoxLayout" name="horizontalLayout">
+            <layout class="QGridLayout" name="gridLayout">
              <property name="leftMargin">
               <number>6</number>
              </property>
@@ -95,20 +95,7 @@
              <property name="bottomMargin">
               <number>6</number>
              </property>
-             <item>
-              <widget class="QLineEdit" name="dsdb_dir_text">
-               <property name="minimumSize">
-                <size>
-                 <width>100</width>
-                 <height>0</height>
-                </size>
-               </property>
-               <property name="readOnly">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
+             <item row="0" column="1">
               <widget class="QPushButton" name="dsdb_dir_btn">
                <property name="maximumSize">
                 <size>
@@ -121,22 +108,58 @@
                </property>
               </widget>
              </item>
-            </layout>
-           </widget>
-          </item>
-          <item>
-           <widget class="QGroupBox" name="groupBox_3">
-            <property name="title">
-             <string>DSDB Database</string>
-            </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_2">
-             <item>
-              <widget class="QPushButton" name="pushButton_2">
+             <item row="0" column="0">
+              <widget class="QLineEdit" name="dsdb_dir_text">
+               <property name="minimumSize">
+                <size>
+                 <width>100</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="readOnly">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0" colspan="2">
+              <widget class="QPushButton" name="dsdb_build_db_btn">
                <property name="enabled">
                 <bool>false</bool>
                </property>
                <property name="text">
-                <string>Build</string>
+                <string>Build Database</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="groupBox_4">
+            <property name="title">
+             <string>Pack Mods Directory</string>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_3">
+             <item>
+              <widget class="QLineEdit" name="pack_mods_dir_text">
+               <property name="minimumSize">
+                <size>
+                 <width>100</width>
+                 <height>0</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="pack_mods_dir_btn">
+               <property name="maximumSize">
+                <size>
+                 <width>40</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>...</string>
                </property>
               </widget>
              </item>
