@@ -389,8 +389,15 @@ class MainWindow(QMainWindow):
         selection_checked_list = src_data.get('checked_index_list', [])
         for i in selection_checked_list:
             src_item: QStandardItem = src_model.invisibleRootItem().child(i)
-            for file_name in src_model.get_files_name_by_asset_item(src_item):
-                copy_result = core.copy_asset_file(src_model.src_path, tgt_model.src_path, file_name)
+            # for file_name in src_model.get_files_name_by_asset_item(src_item):
+            #     copy_result = core.copy_asset_file(src_model.src_path, tgt_model.src_path, file_name)
+            #     log.info(copy_result.message)
+
+            for file_path in src_model.get_files_path_by_asset_item(src_item):
+                src_dir = file_path.parent
+                file_name = file_path.name
+                tgt_dir = tgt_model.src_path / src_dir.relative_to(src_model.src_path)
+                copy_result = core.copy_asset_file(src_dir, tgt_dir, file_name)
                 log.info(copy_result.message)
 
             src_structure = src_model.get_asset_structure_by_asset_item(src_item)
